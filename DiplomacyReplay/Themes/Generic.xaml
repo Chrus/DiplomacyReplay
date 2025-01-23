@@ -5,29 +5,32 @@
 
     <!-- Style for the TabControl -->
     <Style TargetType="local:SidebarControl">
-        <!-- Set the TabPanel's behavior -->
+        <Setter Property="TabStripPlacement" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+
+        <!--Set the TabPanel's behavior-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarControl">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
                         <!-- TabPanel holds the headers -->
-                        <Border>
+                        <Border BorderThickness="0,3,0,0" BorderBrush="MediumBlue">
                             <UniformGrid x:Name="HeaderPanel" 
                                          IsItemsHost="True" 
-                                         Rows="1">
+                                         Columns="1">
                             </UniformGrid>
                         </Border>
 
                         <!-- The content of the TabControl (selected TabItem) -->
-                        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+                        <Border x:Name="selectedContent" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue">
                             <ContentPresenter x:Name="PART_SelectedContentHost"
                                           ContentSource="SelectedContent" 
-                                          Grid.Row="1">
+                                          Grid.Column="1">
                             </ContentPresenter>
                         </Border>
                     </Grid>
@@ -42,9 +45,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarItem">
                     <Grid>
-                        <Border BorderBrush="Green" BorderThickness="5">
+                        <Border x:Name="contentBorder" BorderThickness="3,0,3,3" BorderBrush="MediumBlue" Background="CornflowerBlue">
                             <ContentPresenter x:Name="ContentSite"
-                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" HorizontalAlignment="Center"
                               ContentSource="Header"
                               RecognizesAccessKey="True">
                                 <ContentPresenter.LayoutTransform>
@@ -53,6 +56,12 @@
                             </ContentPresenter>
                         </Border>
                     </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="contentBorder"  Property="BorderThickness" Value="3,0,0,3"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

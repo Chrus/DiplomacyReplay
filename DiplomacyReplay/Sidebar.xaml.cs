@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,25 +16,26 @@ using System.Windows.Shapes;
 namespace DiplomacyReplay
 {
     /// <summary>
-    /// Interaction logic for DipPage.xaml
+    /// Interaction logic for Sidebar.xaml
     /// </summary>
-    public partial class DipPage : Page
+    public partial class Sidebar : UserControl
     {
-        public DipPage()
+        public Sidebar()
         {
             InitializeComponent();
 
-            MouseDown += DipPage_MouseDown;
+            SidebarItem item1 = new SidebarItem("TEST1");
+            sidebar.Items.Add(item1);
+            sidebar.Items.Add(new SidebarItem("test2"));
+            sidebar.Items.Add(new SidebarItem("test500"));
+
+            Loaded += Sidebar_Loaded;
         }
 
-        private void DipPage_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Sidebar_Loaded(object sender, RoutedEventArgs e)
         {
-            if(PageSidebar.IsMouseOver)
-            {
-                PageSidebar.sidebar.ContentVisibility = Visibility.Visible;
-            }
-            else
-                PageSidebar.sidebar.ContentVisibility = Visibility.Collapsed;
+            sidebar.ContentVisibility = Visibility.Collapsed;
+            sidebar.SelectedItem = null;
         }
     }
 }

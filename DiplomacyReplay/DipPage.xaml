@@ -7,33 +7,33 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="DipPage">
-    <Page.Resources>
-        <local:WidthConverter x:Key="widthConverter"/>
-    </Page.Resources>
 
-    <Grid Name="baseGrid">
+    <Grid Name="baseGrid" Background="Yellow">
         <!--<Grid.ColumnDefinitions>
             <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>-->
 
-        <Rectangle Grid.Column="1" Grid.ColumnSpan="2" Fill="Cyan"/>
+        <!--<Rectangle Grid.Column="1" Grid.ColumnSpan="2" Fill="Cyan"/>-->
 
-        <local:SidebarControl Height="200" VerticalAlignment="Top"
-                              x:Name="sidebarControl">
-            <local:SidebarItem x:Name="widthSidebarItem" Header="fdsaaaa" >
-                <Rectangle Width="100" Height="43" Fill="Purple" />
+        <!--<local:SidebarControl Width="200">
+            <local:SidebarItem Header="hello">
+                <Rectangle Width="40" Height="30" Fill="Green" HorizontalAlignment="Right"/>
             </local:SidebarItem>
-
-            <TabItem Header="2test">
-                <Rectangle Width="100" Height="40" Fill="Orange"/>
-            </TabItem>
-
-            <TabItem Header="3test">
-                <Rectangle Width="100" Height="40" Fill="DarkGoldenrod"/>
-            </TabItem>
+            <local:SidebarItem Header="test">
+                <Rectangle Width="40" Height="30" Fill="Fuchsia" HorizontalAlignment="Center"/>
+            </local:SidebarItem>
         </local:SidebarControl>
+
+        <local:SidebarControl Margin="100,0,0,0" Width="300">
+            <local:SidebarItem Header="222"/>
+        </local:SidebarControl>-->
+
+        <local:Sidebar x:Name="PageSidebar"/>
+
+        <!--<Rectangle Width="100" Height="300" HorizontalAlignment="Center" Fill="Red"/>-->
+
 
         <!--<Canvas Name="testCanvas" Grid.Column="0" Grid.ColumnSpan="1"
                 Background="Red" 

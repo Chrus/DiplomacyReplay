@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="DiplomacyReplay.Sidebar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DiplomacyReplay"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <!-- Style for the TabControl -->
+        <Style TargetType="local:SidebarControl">
+            <Setter Property="TabStripPlacement" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+
+            <!--Set the TabPanel's behavior-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="local:SidebarControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- TabPanel holds the headers -->
+                            <Border BorderThickness="0,3,0,0" BorderBrush="MediumBlue">
+                                <UniformGrid x:Name="HeaderPanel" IsItemsHost="True" Columns="1"/>
+                            </Border>
+
+                            <!-- The content of the TabControl (selected TabItem) -->
+                            <Border x:Name="ContentPanel" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue"
+                                    Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Style for the TabItem to control tab header appearance -->
+        <Style TargetType="local:SidebarItem">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="local:SidebarItem">
+                        <Grid x:Name="baseGrid">
+                            <Border x:Name="TabHeaderBorder" BorderThickness="3,0,3,3" BorderBrush="MediumBlue" Background="CornflowerBlue">
+                                <ContentPresenter x:Name="ContentSite"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True">
+                                    <ContentPresenter.LayoutTransform>
+                                        <RotateTransform Angle="90"/>
+                                    </ContentPresenter.LayoutTransform>
+                                </ContentPresenter>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabHeaderBorder"  Property="BorderThickness" Value="3,0,0,3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+    <local:SidebarControl x:Name="sidebar"/>
+    <Rectangle Width="100" Height="10" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="testREct"/>
+    </Grid>
+
+</UserControl>
