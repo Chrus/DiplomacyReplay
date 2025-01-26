@@ -23,8 +23,6 @@ namespace DiplomacyReplay
         public MainWindow()
         {
             InitializeComponent();
-
-            HomeFrame.Content = new DipPage();
         }
     }
 }

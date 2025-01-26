@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,17 +21,28 @@ namespace DiplomacyReplay
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SidebarItem), new FrameworkPropertyMetadata(typeof(SidebarItem)));
         }
-
-        public SidebarItem(string tabName)
+        public SidebarItem()
         {
-            Header = tabName;
-            Content = new Rectangle()
+            PreviewMouseDown += SidebarItem_PreviewMouseDown;
+        }
+
+        //Collapse the Content Panel if clicking the tab that is already selected.  Otherwise make sure to show it
+        private void SidebarItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var control = VisualTreeHelper.GetParent(this);
+            while (control != null && !(control is SidebarControl))
             {
-                Width = 50,
-                Height = 50,
-                Fill =  Brushes.Red,
-                Margin = new Thickness(5)
-            };
+                control = VisualTreeHelper.GetParent(control);
+            }
+
+            if (control != null)
+            {
+                SidebarControl x = control as SidebarControl;
+                if (IsSelected && x.ContentVisibility == Visibility.Visible)
+                    x.ContentVisibility = Visibility.Collapsed;
+                else if (x.ContentVisibility == Visibility.Collapsed || x.ContentVisibility == Visibility.Hidden)
+                    x.ContentVisibility = Visibility.Visible;
+            }
         }
     }
 }

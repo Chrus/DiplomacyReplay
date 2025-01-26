@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,26 +17,29 @@ namespace DiplomacyReplay
 {
     public class SidebarControl : TabControl
     {
+        static SidebarControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SidebarControl), new FrameworkPropertyMetadata(typeof(SidebarControl)));
+        }
         public Visibility ContentVisibility
         {
             get { return (Visibility)GetValue(ContentVisibilityProperty); }
             set { SetValue(ContentVisibilityProperty, value); }
         }
-
-        // Using a DependencyProperty as the backing store for ContentVisibility.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ContentVisibilityProperty =
-            DependencyProperty.Register("ContentVisibility", typeof(Visibility), typeof(SidebarControl), new PropertyMetadata(Visibility.Visible));
-
-        static SidebarControl()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SidebarControl), new FrameworkPropertyMetadata(typeof(SidebarControl)));
-        }
+            DependencyProperty.Register("ContentVisibility", typeof(Visibility), typeof(SidebarControl), new PropertyMetadata(Visibility.Hidden));
 
         public SidebarControl()
         {
-            SelectionChanged += (s, e) => 
+            Loaded += SidebarControl_Loaded;
+        }
+
+        private void SidebarControl_Loaded(object sender, EventArgs e)
+        {
+            Window.GetWindow(this).PreviewMouseDown += (o, i) =>
             {
-                if(this.SelectedItem != null) { ContentVisibility = Visibility.Visible; }
+                if (!IsMouseOver)
+                    ContentVisibility = Visibility.Hidden;
             };
         }
     }

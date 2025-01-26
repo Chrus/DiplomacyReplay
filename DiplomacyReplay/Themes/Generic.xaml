@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:DiplomacyReplay">
 
     <!-- Style for the TabControl -->
-    <Style TargetType="local:SidebarControl">
+    <Style TargetType="{x:Type local:SidebarControl}">
         <Setter Property="TabStripPlacement" Value="Left"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
 
@@ -12,26 +12,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarControl">
-                    <Grid>
+                    <Grid SnapsToDevicePixels="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*" MinWidth="300"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- TabPanel holds the headers -->
+                        <!-- UniformGrid holds the headers -->
                         <Border BorderThickness="0,3,0,0" BorderBrush="MediumBlue">
-                            <UniformGrid x:Name="HeaderPanel" 
-                                         IsItemsHost="True" 
-                                         Columns="1">
-                            </UniformGrid>
+                            <UniformGrid x:Name="HeaderPanel" IsItemsHost="True" Columns="1"/>
                         </Border>
 
                         <!-- The content of the TabControl (selected TabItem) -->
-                        <Border x:Name="selectedContent" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue">
-                            <ContentPresenter x:Name="PART_SelectedContentHost"
-                                          ContentSource="SelectedContent" 
-                                          Grid.Column="1">
-                            </ContentPresenter>
+                        <Border x:Name="ContentPanel" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue"
+                                    Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
+                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"
+                                                  Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -40,27 +36,39 @@
     </Style>
 
     <!-- Style for the TabItem to control tab header appearance -->
-    <Style TargetType="local:SidebarItem">
+    <Style TargetType="{x:Type local:SidebarItem}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarItem">
-                    <Grid>
-                        <Border x:Name="contentBorder" BorderThickness="3,0,3,3" BorderBrush="MediumBlue" Background="CornflowerBlue">
-                            <ContentPresenter x:Name="ContentSite"
-                              VerticalAlignment="Center" HorizontalAlignment="Center"
-                              ContentSource="Header"
-                              RecognizesAccessKey="True">
-                                <ContentPresenter.LayoutTransform>
-                                    <RotateTransform Angle="90"/>
-                                </ContentPresenter.LayoutTransform>
-                            </ContentPresenter>
+                    <Grid x:Name="baseGrid" SnapsToDevicePixels="True">
+                        <Border x:Name="TabHeaderBorder" BorderThickness="3,0,3,3" Padding="3"
+                                BorderBrush="MediumBlue" Background="CornflowerBlue">
+                            <Border x:Name="TabSelectedBorder" Background="CornflowerBlue">
+                                <ContentPresenter x:Name="ContentSite" ContentSource="Header"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                  RecognizesAccessKey="True"
+                                                  TextBlock.FontSize="25"
+                                                  TextBlock.FontWeight="Bold">
+                                    <ContentPresenter.LayoutTransform>
+                                        <RotateTransform Angle="90"/>
+                                    </ContentPresenter.LayoutTransform>
+                                </ContentPresenter>
+                            </Border>
                         </Border>
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="contentBorder"  Property="BorderThickness" Value="3,0,0,3"/>
-                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=Self}}" Value="true"/>
+                                <Condition Binding="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType={x:Type local:SidebarControl}}}" Value="Visible"/>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <!--<Setter TargetName="TabHeaderBorder" Property="BorderBrush" Value="Aquamarine"/>-->
+                                <Setter TargetName="TabHeaderBorder" Property="BorderThickness" Value="3,3,3,3"/>
+                                <Setter TargetName="TabSelectedBorder" Property="Background" Value="Aquamarine"/>
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
