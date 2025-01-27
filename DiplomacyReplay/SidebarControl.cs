@@ -36,16 +36,14 @@ namespace DiplomacyReplay
 
         private void SidebarControl_Initialized(object sender, EventArgs e)
         {
-            var x = Window.GetWindow(this) as Window;
-            if (x != null)
-            {
-                x.PreviewMouseDown += (o, i) =>
-                {
-                    if (!IsMouseOver) ContentVisibility = Visibility.Hidden;
-                };
-            }
-             
-
+            //var x = Window.GetWindow(this) as Window;
+            //if (x != null)
+            //{
+            //    x.PreviewMouseDown += (o, i) =>
+            //    {
+            //        if (!IsMouseOver) ContentVisibility = Visibility.Hidden;
+            //    };
+            //}
         }
     }
 }
