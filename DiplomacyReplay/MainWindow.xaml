@@ -9,45 +9,92 @@
         WindowState="Maximized">
     <Window.Resources>
         
-    </Window.Resources>
-    <Grid>
-        <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Home">
-                <Frame Name="HomeFrame">
-                    <Frame.Content>
-                        <Grid>
+        <Style x:Key="WindowTabControlStyle" TargetType="{x:Type TabControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabControl}">
+                        <Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="50"/>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="300"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
+                            <!--Tab Headers-->
+                            <UniformGrid x:Name="headerPanel" HorizontalAlignment="Stretch"
+                                      Grid.Row="1" Grid.Column="1" Rows="1"
+                                      IsItemsHost="true"/>
 
-                            <Border BorderBrush="Red" BorderThickness="5" Grid.Column="1" Grid.ColumnSpan="2" Focusable="True">
-                                <Canvas Background="CornflowerBlue" Margin="10" Focusable="True">
-                                </Canvas>
+                            <!--Content Panel-->
+                            <Border x:Name="contentPanel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                             </Border>
-
-
-                            <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2" Background="Orange">
-                                <local:SidebarItem Header="Test">
-                                    <TextBlock Text="ONE"/>
-                                </local:SidebarItem>
-                                <local:SidebarItem Header="Test2">
-                                    <TextBlock Text="TWO"/>
-                                </local:SidebarItem>
-                            </local:SidebarControl>
                         </Grid>
-                    </Frame.Content>
-                </Frame>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TabHeaderStyle" TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid x:Name="templateRoot" SnapsToDevicePixels="true" >
+                            <Border x:Name="mainBorder" BorderThickness="0,3,3,3" Padding="3"
+                                    BorderBrush="MediumBlue" Background="CornflowerBlue"
+                                    Grid.Column="1" Height="50">
+                                <ContentPresenter x:Name="contentPresenter" ContentSource="Header"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  TextBlock.FontSize="30" TextBlock.FontWeight="Bold"/>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Name}" Value="HomeTab">
+                                <Setter Property="Width" Value="50" TargetName="mainBorder"/>
+                                <Setter Property="Height" Value="50" TargetName="mainBorder"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Frame x:Name="HomeFrame" Margin="0,0,0,50"/>
+        
+        <Border Background="MediumBlue"
+                Width="50" Height="50"
+                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                PreviewMouseLeftButtonDown="Home_PreviewMouseLeftButtonDown">
+            <Path Fill="CornflowerBlue" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                      Data="M 7.8,35.8 C 7.3,35.7 6.7,35.1 6.5,34.7 6.4,34.4 6.4,32 6.4,27.4 V 20.6 l 8,-6.6 c 4.4,-3.6 8,-6.6 8.1,-6.6 0.1,0 3.7,3 8.1,6.6 l 8,6.6 v 6.9 c 0,4.6 0,6.9 -0.1,7.2 -0.2,0.5 -0.7,1.1 -1.3,1.2 -0.3,0.1 -2.2,0.1 -5.8,0.1 H 26.3 V 30.5 25.1 h -3.6 -3.6 v 5.4 5.4 H 13.6 c -3.2,0 -5.6,-0.1 -5.8,-0.1 z  M 2.3,21 C 2,20.9 0.1,18.6 0,18.3 0,18.1 0,18 0,17.8 0.2,17.5 20.3,0.7 20.9,0.4 c 0.9,-0.5 2.1,-0.5 3.1,-0.1 0.2,0.1 2,1.5 3.9,3.2 l 3.5,3 V 3.5 c 0,-3.2 0,-3.2 0.6,-3.4 C 32.2,0 33.4,0 35.2,0 h 2.8 l 0.3,0.3 0.3,0.3 v 5.9 5.9 l 3.2,2.6 c 1.9,1.6 3.2,2.7 3.2,2.8 0.2,0.5 0,0.7 -1,2 -0.8,1 -1.1,1.2 -1.4,1.3 -0.2,0 -0.4,0 -0.5,0 -0.1,0.1 -4.5,-3.6 -9.8,-8 -5.3,-4.5 -9.7,-8.1 -9.7,-8.1 0,0 -4.4,3.6 -9.7,8.1 -5.3,4.4 -9.7,8.1 -9.8,8.1 -0.2,0.1 -0.5,0.1 -0.7,0 z">
+                <Path.LayoutTransform>
+                    <ScaleTransform ScaleX=".75" ScaleY=".75"/>
+                </Path.LayoutTransform>
+            </Path>
+        </Border>
+
+        <TabControl x:Name="MainTabControl"  TabStripPlacement="Bottom" 
+                    Style="{DynamicResource WindowTabControlStyle}"
+                    ItemContainerStyle="{DynamicResource TabHeaderStyle}">
+
+            <TabItem x:Name="MapTab" Header="Map">
+                <Frame x:Name="MapFrame" />
             </TabItem>
 
-            <TabItem Name="MapTabHeader" Header="Map">
+            <TabItem x:Name="TimelineTab" Header="Timeline">
+                <Frame x:Name="TimelineFrame" />
             </TabItem>
 
-            <TabItem Header="Timeline"/>
-
-            <TabItem Header="Animation"/>
+            <TabItem x:Name="AnimationTab" Header="Animation">
+                <Frame x:Name="AnimationFrame" />
+            </TabItem>
 
         </TabControl>
     </Grid>
