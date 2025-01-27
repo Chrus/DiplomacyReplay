@@ -22,30 +22,30 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class MainWindow : Window
     {
-        private HomePage home;
-        private MapPage map;
-        private TimelinePage timeline;
-        private AnimationPage animation;
+        private HomePage homePage;
+        private MapPage mapPage;
+        private TimelinePage timelinePage;
+        private AnimationPage animationPage;
 
-        public HomePage HomePage { get { return home; } }
-        public MapPage MapPage { get { return map; } }
-        public TimelinePage TimelinePage { get { return timeline; } } 
-        public AnimationPage AnimationPage { get { return animation; } }    
+        public HomePage HomePage { get { return homePage; } }
+        public MapPage MapPage { get { return mapPage; } }
+        public TimelinePage TimelinePage { get { return timelinePage; } } 
+        public AnimationPage AnimationPage { get { return animationPage; } }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
-
+            
             Loaded += MainWindow_Loaded;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            home = new HomePage(this);
-            map = new MapPage(this);
-            timeline = new TimelinePage(this);
-            animation = new AnimationPage(this);
+            homePage = new HomePage(this);
+            mapPage = new MapPage(this);
+            timelinePage = new TimelinePage(this);
+            animationPage = new AnimationPage(this);
 
             HomeFrame.Content = HomePage;
             MapFrame.Content = MapPage;

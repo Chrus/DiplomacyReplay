@@ -85,7 +85,7 @@
                     ItemContainerStyle="{DynamicResource TabHeaderStyle}">
 
             <TabItem x:Name="MapTab" Header="Map">
-                <Frame x:Name="MapFrame" />
+                <Frame Name="MapFrame" />
             </TabItem>
 
             <TabItem x:Name="TimelineTab" Header="Timeline">

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SkiaSharp;
 
 namespace DiplomacyReplay
 {
@@ -21,10 +22,19 @@ namespace DiplomacyReplay
     public partial class MapPage : Page
     {
         private MainWindow main;
+        private DipMap map;
         public MapPage(MainWindow main)
-        {      
+        {
             this.main = main;
             InitializeComponent();
+        }
+
+        public void NewMap(DipMap map)
+        {
+            if (map != null)
+                throw new Exception("MapPage map not null and is being overwritten");
+
+            this.map = map;
         }
     }
 }

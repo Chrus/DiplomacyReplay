@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -23,18 +24,31 @@ namespace DiplomacyReplay
         }
         public SidebarItem()
         {
-            PreviewMouseDown += SidebarItem_PreviewMouseDown;
+
+            
+
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+
+            var headPanal = Template.FindName("HeaderPanel", this);
+            if (headPanal != null)
+            {
+               // headPanal.PreviewMouseDown += SidebarItem_PreviewMouseDown;
+            }
         }
 
         //Collapse the Content Panel if clicking the tab that is already selected.  Otherwise make sure to show it
         private void SidebarItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
+        {            
             var control = VisualTreeHelper.GetParent(this);
             while (control != null && !(control is SidebarControl))
             {
                 control = VisualTreeHelper.GetParent(control);
             }
-
+            
             if (control != null)
             {
                 SidebarControl x = control as SidebarControl;

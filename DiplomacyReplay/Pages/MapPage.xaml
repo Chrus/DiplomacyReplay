@@ -21,9 +21,14 @@
                            FontSize="50"/>
         </Border>
         
-        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2" Background="Orange">
-            <local:SidebarItem Header="Background">
-                <TextBlock Text="ONE"/>
+        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2" 
+ContentVisibility="Visible">
+            <local:SidebarItem Header="Image">
+                <StackPanel Orientation="Vertical" Margin="10"
+                            HorizontalAlignment="Stretch">
+                    <TextBox Text="No Image Selected" IsReadOnly="True" 
+                             HorizontalAlignment="Stretch"/>
+                </StackPanel>
             </local:SidebarItem>
             <local:SidebarItem Header="Territories">
                 <TextBlock Text="TWO"/>
