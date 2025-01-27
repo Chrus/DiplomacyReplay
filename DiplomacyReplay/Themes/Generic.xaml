@@ -19,7 +19,7 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- UniformGrid holds the headers -->
-                        <Border BorderThickness="0,3,0,0" BorderBrush="MediumBlue">
+                        <Border BorderThickness="0,0,0,0" BorderBrush="MediumBlue">
                             <UniformGrid x:Name="HeaderPanel" IsItemsHost="True" Columns="1"/>
                         </Border>
 
@@ -27,7 +27,7 @@
                         <Border x:Name="ContentPanel" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue"
                                     Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
                             <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"
-                                                  Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}"/>
+                                              Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -35,13 +35,13 @@
         </Setter>
     </Style>
 
-    <!-- Style for the TabItem to control tab header appearance -->
+    <!-- Style for the TabItem header appearance -->
     <Style TargetType="{x:Type local:SidebarItem}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarItem">
                     <Grid x:Name="baseGrid" SnapsToDevicePixels="True">
-                        <Border x:Name="TabHeaderBorder" BorderThickness="3,0,3,3" Padding="3"
+                        <Border x:Name="TabHeaderBorder" BorderThickness="3,3,3,0" Padding="3"
                                 BorderBrush="MediumBlue" Background="CornflowerBlue">
                             <Border x:Name="TabSelectedBorder" Background="CornflowerBlue">
                                 <ContentPresenter x:Name="ContentSite" ContentSource="Header"
@@ -65,7 +65,7 @@
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
                                 <!--<Setter TargetName="TabHeaderBorder" Property="BorderBrush" Value="Aquamarine"/>-->
-                                <Setter TargetName="TabHeaderBorder" Property="BorderThickness" Value="3,3,3,3"/>
+                                <!--<Setter TargetName="TabHeaderBorder" Property="BorderThickness" Value="3,3,3,3"/>-->
                                 <Setter TargetName="TabSelectedBorder" Property="Background" Value="Aquamarine"/>
                             </MultiDataTrigger.Setters>
                         </MultiDataTrigger>
