@@ -31,7 +31,7 @@ namespace DiplomacyReplay
 
         public SidebarControl()
         {
-            Initialized += SidebarControl_Initialized;
+            //Initialized += SidebarControl_Initialized;
         }
 
         private void SidebarControl_Initialized(object sender, EventArgs e)

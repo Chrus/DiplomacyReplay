@@ -24,20 +24,18 @@ namespace DiplomacyReplay
         }
         public SidebarItem()
         {
-
-            
-
         }
 
-        protected override void OnInitialized(EventArgs e)
+        public override void OnApplyTemplate()
         {
-            base.OnInitialized(e);
+            base.OnApplyTemplate();
 
-            var headPanal = Template.FindName("HeaderPanel", this);
-            if (headPanal != null)
+            Grid x = Template.FindName("baseGrid", this) as Grid;
+            if(x != null)
             {
-               // headPanal.PreviewMouseDown += SidebarItem_PreviewMouseDown;
+                x.PreviewMouseDown += SidebarItem_PreviewMouseDown;
             }
+
         }
 
         //Collapse the Content Panel if clicking the tab that is already selected.  Otherwise make sure to show it
