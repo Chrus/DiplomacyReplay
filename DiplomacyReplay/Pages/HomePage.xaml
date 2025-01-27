@@ -1,0 +1,39 @@
+﻿<Page x:Class="DiplomacyReplay.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:DiplomacyReplay"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="HomePage">
+
+    <Grid Background="#2293BD">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+            
+            <GroupBox Header="Map" Padding="20" Margin="150,0,150,0">
+                <StackPanel Orientation="Vertical">
+                    <TextBox Text="None Loaded" IsReadOnly="True"/>
+
+                    <Separator Margin="5"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Load Map" Width="150" Height="50"/>
+                        <Button Content="Create New Map" Width="150" Height="50"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Timeline" Padding="20" Margin="150,0,150,0">
+                <StackPanel Orientation="Vertical">
+                    <TextBox Text="None Loaded" IsReadOnly="True"/>
+
+                    <Separator Margin="5"/>
+
+                    <Button Content="Load Timeline" Width="150" Height="50"/>
+                </StackPanel>
+
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</Page>
