@@ -21,7 +21,7 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class HomePage : Page
     {
-        private MainWindow main;
+        private readonly MainWindow main;
         bool mapLoaded = false;
         bool timelineLoaded = false;
 

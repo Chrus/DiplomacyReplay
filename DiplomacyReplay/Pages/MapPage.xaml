@@ -15,24 +15,32 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border BorderBrush="Red" BorderThickness="5" Grid.Column="1" Grid.ColumnSpan="2" Background="CornflowerBlue">
-            <TextBlock Text="MAP PLACEHOLDER" Background="IndianRed"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           FontSize="50"/>
+        <Border x:Name="viewboxBorder" Grid.Column="1" Grid.ColumnSpan="2"
+                BorderThickness="3" BorderBrush="Red"
+                Background="Aquamarine">
+            <Viewbox Stretch="None">
+                <Image x:Name="canvasElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            </Viewbox>
         </Border>
-        
-        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2" 
-ContentVisibility="Visible">
+
+
+
+        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2" >
             <local:SidebarItem Header="Image">
-                <StackPanel Orientation="Vertical" Margin="10"
-                            HorizontalAlignment="Stretch">
-                    <TextBox Text="No Image Selected" IsReadOnly="True" 
-                             HorizontalAlignment="Stretch"/>
+                <StackPanel Orientation="Vertical" Margin="20">
+                    <TextBlock Text="Map Background:" FontSize="15" FontWeight="Bold" TextDecorations="Underline"/>
+                    <TextBlock x:Name="imageFile" Margin="15,0,0,0"
+                               Text="{Binding BackgroundLocation, RelativeSource={RelativeSource AncestorType={x:Type local:MapPage}}}"
+                               ToolTip="{Binding BackgroundLocation, RelativeSource={RelativeSource AncestorType={x:Type local:MapPage}}}"/>
+                    <Button x:Name="LoadImageButton" Content="Load Image" Margin="0,25,0,0"
+                            Click="LoadImageButton_Click"/>
                 </StackPanel>
             </local:SidebarItem>
+            
             <local:SidebarItem Header="Territories">
                 <TextBlock Text="TWO"/>
             </local:SidebarItem>
+            
             <local:SidebarItem Header="Countries">
                 <TextBlock Text="Three"/>
             </local:SidebarItem>
