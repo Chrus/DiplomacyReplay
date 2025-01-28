@@ -155,7 +155,7 @@ namespace DiplomacyReplay
             }
         }
 
-        public bool IsFinalizable()
+        public virtual bool IsFinalizable()
         {
             return Name != null
                 && NameLoc != SKPoint.Empty
@@ -192,7 +192,7 @@ namespace DiplomacyReplay
         #region
 //Private Functions//
 
-        private void finalizedCheck()
+        protected void finalizedCheck()
         {
             if (!IsEditable)
                 throw new InvalidOperationException("Territory is finalized and can't be edited");
