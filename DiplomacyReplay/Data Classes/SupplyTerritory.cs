@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    internal class SupplyTerritory : Territory
+    public class SupplyTerritory : Territory
     {
         public SupplyTerritory() : base() { }
 
@@ -22,9 +22,9 @@ namespace DiplomacyReplay
             }
         }
 
-        public override bool IsFinalizable()
+        public override bool CanFinalize()
         {
-            return base.IsFinalizable()
+            return base.CanFinalize()
                 && SupplyLocation != SKPoint.Empty;
         }
     }

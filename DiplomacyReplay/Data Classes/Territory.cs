@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    internal class Territory
+    public class Territory
     {
         public enum TERRITORY_TYPE
         {
@@ -24,7 +24,7 @@ namespace DiplomacyReplay
         public Territory()
         {
             IsEditable = true;
-            extraGarrisons = new List<Tuple<string, SKPoint>>();
+            extraGarrisons = [];
         }
 
         #endregion
@@ -155,7 +155,7 @@ namespace DiplomacyReplay
             }
         }
 
-        public virtual bool IsFinalizable()
+        public virtual bool CanFinalize()
         {
             return Name != null
                 && NameLoc != SKPoint.Empty
@@ -169,7 +169,7 @@ namespace DiplomacyReplay
         /// <returns>True if IsFinalizable() == true and IsEditable is set to false.  Otherwise return false</returns>
         public bool Finalize()
         {
-            if (IsFinalizable())
+            if (CanFinalize())
             {
                 IsEditable = false;
                 return true;
@@ -186,7 +186,7 @@ namespace DiplomacyReplay
         private TERRITORY_TYPE _territoryType;
         private SKPoint _garrisonLoc;
         //Non default garrison locations.  GarrisonLoc, the default loc, is not in here
-        private List<Tuple<string, SKPoint>> extraGarrisons;
+        private readonly List<Tuple<string, SKPoint>> extraGarrisons;
 
         #endregion
         #region

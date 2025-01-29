@@ -107,9 +107,9 @@ namespace DiplomacyReplay
         private void LoadBackground(string path)
         {
             SKBitmap bit = LoadSkBitmapFromPngFile(path);
-            map.bitmapSource = ConvertSkBitmapToBitmapSource(bit);
+            map.BackgroundImage = ConvertSkBitmapToBitmapSource(bit);
 
-            canvasElement.Source = map.bitmapSource;
+            canvasElement.Source = map.BackgroundImage;
             BackgroundLocation = path;
 
         }
