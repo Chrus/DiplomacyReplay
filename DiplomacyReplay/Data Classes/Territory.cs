@@ -52,7 +52,7 @@ namespace DiplomacyReplay
         public SKPoint NameLoc
         {
             get { return _nameLoc; }
-            private set
+            set
             {
                 finalizedCheck();
                 _nameLoc = value;
@@ -62,7 +62,7 @@ namespace DiplomacyReplay
         public TERRITORY_TYPE TerritoryType
         {
             get { return _territoryType; }
-            private set
+            set
             {
                 finalizedCheck();
                 _territoryType = value;

@@ -15,7 +15,7 @@
                     <Grid SnapsToDevicePixels="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*" MinWidth="300"/>
+                            <ColumnDefinition Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- UniformGrid holds the headers -->
@@ -25,8 +25,7 @@
                         <!-- The content of the TabControl (selected TabItem) -->
                         <Border x:Name="ContentPanel" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue"
                                 Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
-                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"
-                                              Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}"/>
+                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>

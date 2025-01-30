@@ -39,17 +39,22 @@ namespace DiplomacyReplay
         public MapPage(MainWindow main)
         {
             this.main = main;
+            map = new DipMap();
             InitializeComponent();
 
-            DataContext = this;
-
             /////
+            ///TODO
             //Test code, to remove
             /////
-            LoadBackground("C:\\Users\\Chris\\Desktop\\DipMapC.png");
+            ///
+            map = DipMap.GetTestingMap();
+            canvasElement.Source = map.BackgroundImage;
+            BackgroundLocation = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
+
+            this.DataContext = map;
         }
 
-        private SKBitmap LoadSkBitmapFromPngFile(string filePath)
+        private static SKBitmap LoadSkBitmapFromPngFile(string filePath)
         {
             try
             {
@@ -62,7 +67,7 @@ namespace DiplomacyReplay
                 return null;
             }
         }
-        private BitmapSource ConvertSkBitmapToBitmapSource(SKBitmap skBitmap) 
+        private static BitmapSource ConvertSkBitmapToBitmapSource(SKBitmap skBitmap) 
         {
 
             using SKImage skImage = SKImage.FromBitmap(skBitmap);
@@ -104,19 +109,16 @@ namespace DiplomacyReplay
             this.map = map;
         }
 
-        private void LoadBackground(string path)
+        public static BitmapSource LoadTestingBackground()
         {
+            string path = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
             SKBitmap bit = LoadSkBitmapFromPngFile(path);
-            map.BackgroundImage = ConvertSkBitmapToBitmapSource(bit);
-
-            canvasElement.Source = map.BackgroundImage;
-            BackgroundLocation = path;
-
+            return ConvertSkBitmapToBitmapSource(bit);
         }
 
         private void LoadImageButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadBackground(PromptUserForImageLocation());
+            LoadTestingBackground(/*PromptUserForImageLocation()*/);
         }
     }
 }
