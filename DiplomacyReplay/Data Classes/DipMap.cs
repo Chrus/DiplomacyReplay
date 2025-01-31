@@ -100,7 +100,10 @@ namespace DiplomacyReplay
                     territory.TerritoryType = Territory.TERRITORY_TYPE.OCEAN;
 
                 if (x % 4 == 0)
+                {
                     territory.AddGarrisonLoc("sc" + x, new SKPoint(x * 5 + 5, 130 + (x * 4)));
+                    territory.AddGarrisonLoc("sc2" + x, new SKPoint(x * 5 + 5, 130 + (x * 4 + 10)));
+                }
 
                 if (x % 3 == 0)
                     ((SupplyTerritory)territory).SupplyLocation = new SKPoint(x * 5 + 5, 125);

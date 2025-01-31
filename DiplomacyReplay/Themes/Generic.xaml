@@ -24,8 +24,8 @@
 
                         <!-- The content of the TabControl (selected TabItem) -->
                         <Border x:Name="ContentPanel" Grid.Column="1" BorderBrush="MediumBlue" BorderThickness="0,3,3,3" Background="CornflowerBlue"
-                                Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
-                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Grid.Column="1"/>
+                                    Visibility="{Binding ContentVisibility, RelativeSource={RelativeSource AncestorType=local:SidebarControl}}">
+                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -35,6 +35,8 @@
 
     <!-- Style for the TabItem header appearance -->
     <Style TargetType="{x:Type local:SidebarItem}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SidebarItem">

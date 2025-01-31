@@ -76,10 +76,15 @@ namespace DiplomacyReplay
         {
             get { return _garrisonLoc; }
             set
-            {
+            { 
                 finalizedCheck();
                 _garrisonLoc = value;
             }
+        }
+
+        public List<Tuple<string, SKPoint>> ExtraGarrisons
+        {
+            get { return extraGarrisons; }
         }
 
         #endregion

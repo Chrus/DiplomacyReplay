@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="DiplomacyReplay.MapTerritoryTabContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DiplomacyReplay"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="250" d:Background="CornflowerBlue">
+    <UserControl.Resources>
+        <local:TypeToVisibilityConverter x:Key="T2VC"/>
+        <local:ExtraGarrisonVisibilityConverter x:Key="XGVC"/>
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <Grid>
+            <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch"
+ d:Visibility="Collapsed" Visibility="Collapsed">
+                <Button Content="Finalize Check" Height="30"/>
+
+                <Separator Margin="-10,10,-10,10" Background="DarkBlue" />
+
+                <ListBox x:Name="TerList" MinHeight="100" MaxHeight="150"
+                     ItemsSource="{Binding}" DisplayMemberPath="Name">
+                </ListBox>
+
+                <Separator Margin="5,10,5,10" Background="DarkBlue"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
+                    <Button Content="X" Width="20" Height="20" Margin="2,0,2,0"/>
+                    <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"/>
+                </StackPanel>
+
+                <Border BorderBrush="DarkBlue" BorderThickness="2" Padding="10" Margin="-5,0,-5,-5">
+                    <StackPanel Orientation="Vertical">
+                        <GroupBox Header="Territory Name" Padding="5">
+                            <StackPanel Orientation="Vertical">
+                                <TextBox Text="{Binding ElementName=TerList, Path=SelectedItem.Name}"/>
+                                <local:LocationSelector HorizontalAlignment="Stretch" Margin="2"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Type" Padding="5">
+                            <StackPanel Orientation="Vertical">
+                                <RadioButton Content="Land"/>
+                                <RadioButton Content="Coast"/>
+                                <RadioButton Content="Water"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Supply Point">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Content="Y"/>
+                                    <RadioButton Content="N"/>
+                                </StackPanel>
+
+                                <local:LocationSelector/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Garrison">
+                            <StackPanel Orientation="Vertical">
+                                <local:LocationSelector/>
+
+                                <Separator Margin="5,15,5,10" Background="DarkBlue"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
+                                    <Button Content="X" Width="20" Height="20" Margin="2,0,2,0"/>
+                                    <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"/>
+                                </StackPanel>
+
+                                <ListBox>
+                                    <TextBlock Text="temp1"/>
+                                    <TextBlock Text="temp2"/>
+                                </ListBox>
+                            </StackPanel>
+
+                        </GroupBox>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="FinalizedPane">
+                <ItemsControl ItemsSource="{Binding}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" Grid.Row="0"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderThickness="1" BorderBrush="DarkBlue" Margin="5,2.5,5,2.5" Padding="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Rectangle Grid.Row="0"      Width="10" Height="10" Fill="red"/>
+                                    <TextBlock Text="{Binding Name}" Grid.Column="1" Grid.Row="0"/>
+
+                                    <TextBlock Text="{Binding TerritoryType}" Grid.Column="1" Grid.Row="1"/>
+
+                                    <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2"
+                                        Visibility="{Binding Converter={StaticResource T2VC}}">
+                                        <Rectangle Grid.Column="0"      Width="10" Height="10" Fill="red"/>
+                                        <TextBlock Text="{Binding SupplyLocation}" Grid.Column="1" />
+                                    </StackPanel>
+
+                                    <Rectangle Grid.Row="3"        Width="10" Height="10" Fill="red"/>
+                                    <TextBlock Text="Garrison Location" Grid.Column="1" Grid.Row="3"/>
+
+                                    <ListBox Grid.Row="4" Grid.Column="1"
+                                             ItemsSource="{Binding ExtraGarrisons}"
+                                             Visibility="{Binding Converter={StaticResource XGVC}}">
+                                    </ListBox>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
