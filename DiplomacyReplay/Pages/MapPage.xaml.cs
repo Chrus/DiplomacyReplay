@@ -26,7 +26,15 @@ namespace DiplomacyReplay
     public partial class MapPage : Page
     {
         private readonly MainWindow main;
-        private DipMap map;
+
+        public DipMap MyMap
+        {
+            get { return (DipMap)GetValue(MyMapProperty); }
+            set { SetValue(MyMapProperty, value); }
+        }
+        // Using a DependencyProperty as the backing store for MyMap.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MyMapProperty =
+            DependencyProperty.Register("MyMap", typeof(DipMap), typeof(MapPage), new PropertyMetadata(null));
 
         public string BackgroundLocation
         {
@@ -38,20 +46,22 @@ namespace DiplomacyReplay
 
         public MapPage(MainWindow main)
         {
-            this.main = main;
-            map = new DipMap();
+
             InitializeComponent();
+
+            MyMap = DipMap.GetTestingMap();
+            this.main = main;
+            DataContext = MyMap;
 
             /////
             ///TODO
             //Test code, to remove
             /////
             ///
-            map = DipMap.GetTestingMap();
-            canvasElement.Source = map.BackgroundImage;
+            canvasElement.Source = MyMap.BackgroundImage;
             BackgroundLocation = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
 
-            this.DataContext = map;
+
         }
 
         private static SKBitmap LoadSkBitmapFromPngFile(string filePath)
@@ -106,7 +116,7 @@ namespace DiplomacyReplay
             if (map != null)
                 MessageBox.Show("MapPage map not null and is being overwritten");
 
-            this.map = map;
+            MyMap = map;
         }
 
         public static BitmapSource LoadTestingBackground()

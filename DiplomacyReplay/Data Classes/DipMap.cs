@@ -4,37 +4,55 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using SkiaSharp;
 
 namespace DiplomacyReplay
 {
-    public class DipMap
+    public class DipMap : DependencyObject
     {
         public DipMap()
         {
             IsEditable = true;
-            _territories = [];
-            _countries = [];
         }
 
-        private readonly Dictionary<string, Territory> _territories;
-        public IReadOnlyDictionary<string, Territory> Territories
+        public static readonly DependencyProperty TerritoriesProperty =
+            DependencyProperty.Register("Territories", typeof(Dictionary<string, Territory>), typeof(DipMap), new PropertyMetadata(new Dictionary<string, Territory>()));
+        public Dictionary<string, Territory> Territories
         {
-            get { return _territories; }
+            get 
+            {
+                return (Dictionary<string, Territory>)GetValue(TerritoriesProperty);
+            }
         }
         public void AddTerritory(Territory territory)
         {
             if (!IsEditable)
                 throw new InvalidOperationException("Map has been finalized and cannot be edited");
             
-            if (_territories.ContainsKey(territory.Name))
-                _territories[territory.Name] = territory;
+            var t = new Dictionary<string, Territory>(Territories);
+
+            if (t.ContainsKey(territory.Name))
+                t[territory.Name] = territory;
             else
-                _territories.Add(territory.Name, territory);
+                t.Add(territory.Name, territory);
+
+            SetValue(TerritoriesProperty, t);
+        }     
+        public void RemoveTerritory(Territory territory)
+        {
+            if (!IsEditable)
+                throw new InvalidOperationException("Map has been finalized and cannot be edited");
+
+            var t = new Dictionary<string, Territory>(Territories);
+
+            t.Remove(territory.Name);
+            SetValue(TerritoriesProperty, t);
         }
 
-        private readonly Dictionary<string, Country> _countries;
+        private readonly Dictionary<string, Country> _countries = [];
         public IReadOnlyDictionary<string, Country> Countries
         {
             get { return _countries; }
@@ -67,7 +85,7 @@ namespace DiplomacyReplay
         {
             return BackgroundImage != null
                 && _countries.Count > 0
-                && _territories.Count > 0
+                && Territories.Count > 0
                 && Territories.All(x => x.Value.CanFinalize())
                 && Countries.All(x => x.Value.CanFinalize());
         }
@@ -97,7 +115,7 @@ namespace DiplomacyReplay
                 else if (x % 2 == 0)
                     territory.TerritoryType = Territory.TERRITORY_TYPE.COAST;
                 else
-                    territory.TerritoryType = Territory.TERRITORY_TYPE.OCEAN;
+                    territory.TerritoryType = Territory.TERRITORY_TYPE.WATER;
 
                 if (x % 4 == 0)
                 {

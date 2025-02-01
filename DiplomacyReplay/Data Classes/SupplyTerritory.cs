@@ -22,6 +22,9 @@ namespace DiplomacyReplay
             }
         }
 
+        //Used by .xaml stuff so I dont need to make a million visibility converters
+        public override bool IsSupply { get { return true; } }
+
         public override bool CanFinalize()
         {
             return base.CanFinalize()

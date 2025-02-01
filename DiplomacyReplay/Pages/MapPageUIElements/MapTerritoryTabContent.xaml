@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:DiplomacyReplay"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="250" d:Background="CornflowerBlue">
+             d:DesignHeight="650" d:DesignWidth="250" d:Background="CornflowerBlue">
     <UserControl.Resources>
         <local:TypeToVisibilityConverter x:Key="T2VC"/>
         <local:ExtraGarrisonVisibilityConverter x:Key="XGVC"/>
@@ -14,74 +14,197 @@
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <Grid>
-            <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch"
- d:Visibility="Collapsed" Visibility="Collapsed">
+            <!--Editor for when DipMap isnt finalized-->
+            <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch">
                 <Button Content="Finalize Check" Height="30"/>
 
                 <Separator Margin="-10,10,-10,10" Background="DarkBlue" />
 
+                <!--Selection Box-->
                 <ListBox x:Name="TerList" MinHeight="100" MaxHeight="150"
-                     ItemsSource="{Binding}" DisplayMemberPath="Name">
+                         ItemsSource="{Binding Territories.Values}" DisplayMemberPath="Name">
                 </ListBox>
 
                 <Separator Margin="5,10,5,10" Background="DarkBlue"/>
 
+                <!--Selection Box Buttons-->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
-                    <Button Content="X" Width="20" Height="20" Margin="2,0,2,0"/>
-                    <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"/>
+                    <Button x:Name="AddTerritoryButton" Content="+" Width="20" Height="20" Margin="2,0,2,0"
+                            Click="AddTerritoryButton_Click"/>
+                    <Button x:Name="RemoveTerritoryButton" Content="-" Width="20" Height="20" Margin="2,0,2,0"
+                            Click="RemoveTerritoryButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Territories.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </StackPanel>
 
-                <Border BorderBrush="DarkBlue" BorderThickness="2" Padding="10" Margin="-5,0,-5,-5">
-                    <StackPanel Orientation="Vertical">
-                        <GroupBox Header="Territory Name" Padding="5">
-                            <StackPanel Orientation="Vertical">
-                                <TextBox Text="{Binding ElementName=TerList, Path=SelectedItem.Name}"/>
-                                <local:LocationSelector HorizontalAlignment="Stretch" Margin="2"/>
-                            </StackPanel>
-                        </GroupBox>
+                <!--Selected Item Presenter-->
 
-                        <GroupBox Header="Type" Padding="5">
-                            <StackPanel Orientation="Vertical">
-                                <RadioButton Content="Land"/>
-                                <RadioButton Content="Coast"/>
-                                <RadioButton Content="Water"/>
-                            </StackPanel>
-                        </GroupBox>
+                <ContentControl Content="{Binding SelectedItem, ElementName=TerList}">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <!--Hide Panel if no item selected-->
+                            <Style.Triggers>
+                                <Trigger Property="Content" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Trigger>
+                            </Style.Triggers>
 
-                        <GroupBox Header="Supply Point">
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal">
-                                    <RadioButton Content="Y"/>
-                                    <RadioButton Content="N"/>
-                                </StackPanel>
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <Border BorderBrush="DarkBlue" BorderThickness="2" Padding="10" Margin="-5,0,-5,-5" d:Visibility="Visible">
+                                            <StackPanel Orientation="Vertical">
+                                                <!--Name-->
+                                                <GroupBox Header="Territory Name" Padding="5">
+                                                    <StackPanel Orientation="Vertical">
+                                                        <TextBox x:Name="NameBox" Text="{Binding Name}"/>
+                                                        <local:LocationSelector HorizontalAlignment="Stretch" Margin="2"/>
+                                                    </StackPanel>
+                                                </GroupBox>
 
-                                <local:LocationSelector/>
-                            </StackPanel>
-                        </GroupBox>
+                                                <!--Territory Type-->
+                                                <GroupBox Header="Type" Padding="5">
+                                                    <StackPanel Orientation="Vertical">
+                                                        <RadioButton x:Name="LandBut" Content="Land">
+                                                            <RadioButton.Style>
+                                                                <Style TargetType="RadioButton">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding TerritoryType}" Value="LAND">
+                                                                            <Setter Property="IsChecked" Value="True"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </RadioButton.Style>
+                                                        </RadioButton>
+                                                        <RadioButton x:Name="CoastBut" Content="Coast">
+                                                            <RadioButton.Style>
+                                                                <Style TargetType="RadioButton">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding TerritoryType}" Value="COAST">
+                                                                            <Setter Property="IsChecked" Value="True"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </RadioButton.Style>
+                                                        </RadioButton>
+                                                        <RadioButton x:Name="WaterBut" Content="Water">
+                                                            <RadioButton.Style>
+                                                                <Style TargetType="RadioButton">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding TerritoryType}" Value="WATER">
+                                                                            <Setter Property="IsChecked" Value="True"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </RadioButton.Style>
+                                                        </RadioButton>
+                                                    </StackPanel>
+                                                </GroupBox>
 
-                        <GroupBox Header="Garrison">
-                            <StackPanel Orientation="Vertical">
-                                <local:LocationSelector/>
+                                                <!--Supply Point-->
+                                                <Button x:Name="MakeSupplyBut" Content="Make Supply Point" Margin="5"
+                                                        Click="AddRemSupply_Click">
+                                                    <!--Hide Button if already a supply point-->
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSupply}" Value="true">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
 
-                                <Separator Margin="5,15,5,10" Background="DarkBlue"/>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
-                                    <Button Content="X" Width="20" Height="20" Margin="2,0,2,0"/>
-                                    <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"/>
-                                </StackPanel>
+                                                <GroupBox>
+                                                    <!--Hide Groupbox if not a supply point-->
+                                                    <GroupBox.Style>
+                                                        <Style TargetType="GroupBox">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSupply}" Value="true">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsSupply}" Value="false">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </GroupBox.Style>
+                                                    
+                                                    <GroupBox.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="Supply Point"/>
+                                                            <Button x:Name="RemoveSupplyBut" Content=" - " Margin="5,0,0,0"
+                                                                    Click="AddRemSupply_Click"/>
+                                                        </StackPanel>
+                                                    </GroupBox.Header>
 
-                                <ListBox>
-                                    <TextBlock Text="temp1"/>
-                                    <TextBlock Text="temp2"/>
-                                </ListBox>
-                            </StackPanel>
+                                                    <StackPanel Orientation="Vertical">
+                                                        <local:LocationSelector/>
+                                                    </StackPanel>
+                                                </GroupBox>
 
-                        </GroupBox>
-                    </StackPanel>
-                </Border>
+                                                <!--Garrison-->
+                                                <GroupBox Header="Garrison">
+                                                    <StackPanel Orientation="Vertical">
+                                                        <local:LocationSelector/>
+
+                                                        <Separator Margin="5,15,5,10" Background="DarkBlue"/>
+
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
+                                                            <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"
+                                                            Click="AddGarrisonBut_Click"/>
+                                                            <Button Content="-" Width="20" Height="20" Margin="2,0,2,0">
+                                                                <!--Hide Remove Garrison Button if there are none-->
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Path=ExtraGarrisons.Count}" Value="0">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                            </Button>
+                                                        </StackPanel>
+
+                                                        <ListBox ItemsSource="{Binding ExtraGarrisons}">
+                                                            <!--Hide Extra Garrison box if there are none-->
+                                                            <ListBox.Style>
+                                                                <Style TargetType="ListBox">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Path=ExtraGarrisons.Count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </ListBox.Style>
+                                                        </ListBox>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                            </StackPanel>
+                                        </Border>
+
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
             </StackPanel>
 
-            <StackPanel x:Name="FinalizedPane">
-                <ItemsControl ItemsSource="{Binding}">
+
+            <StackPanel x:Name="FinalizedPane"
+d:Visibility="Collapsed" Visibility="Collapsed">
+                <ItemsControl ItemsSource="{Binding Territories.Values}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Vertical" Grid.Row="0"/>

@@ -59,5 +59,60 @@ namespace DiplomacyReplay
         {
             InitializeComponent();
         }
+
+        private DipMap GetMap()
+        {
+            var x = DataContext as DipMap;
+            if (x == null)
+                throw new NullReferenceException("DataContext not set to a DipMap");
+
+            return x;
+        }
+
+        private void RemoveTerritoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var i = TerList.SelectedItem as Territory;
+            if(i != null)
+                GetMap().RemoveTerritory(i);
+        }
+
+        private void AddTerritoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            for (int x = 1; ; x++)
+            {
+                if (!GetMap().Territories.Keys.Contains("Territory" + x))
+                {
+                    var ter = new Territory();
+                    ter.Name = "Territory" + x;
+                    GetMap().AddTerritory(ter);
+                    return;
+                }
+            }
+        }
+
+        private void AddGarrisonBut_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void AddRemSupply_Click(object sender, RoutedEventArgs e)
+        {
+            var oldIndex = TerList.SelectedIndex;
+            var oldTerritory = TerList.SelectedItem as Territory;
+            var newTerritory = (TerList.SelectedItem is SupplyTerritory)
+                ? new Territory()
+                : new SupplyTerritory();
+
+            newTerritory.Name = oldTerritory.Name;
+            newTerritory.NameLoc = oldTerritory.NameLoc;
+            newTerritory.TerritoryType = oldTerritory.TerritoryType;
+            newTerritory.GarrisonLoc = oldTerritory.GarrisonLoc;
+            foreach (var x in oldTerritory.ExtraGarrisons)
+            {
+                newTerritory.AddGarrisonLoc(x.Item1, x.Item2);
+            }
+
+            GetMap().AddTerritory(newTerritory);
+            TerList.SelectedIndex = oldIndex;
+        }
     }
 }

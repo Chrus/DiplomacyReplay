@@ -15,7 +15,7 @@ namespace DiplomacyReplay
             UNDEFINED,
             LAND,
             COAST,
-            OCEAN
+            WATER
         }
 
         #region 
@@ -86,6 +86,8 @@ namespace DiplomacyReplay
         {
             get { return extraGarrisons; }
         }
+
+        public virtual bool IsSupply {  get { return false; } }
 
         #endregion
         #region
