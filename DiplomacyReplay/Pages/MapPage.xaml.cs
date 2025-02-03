@@ -17,6 +17,7 @@ using SkiaSharp;
 using SkiaSharp.Views.WPF;
 using SkiaSharp.Views;
 using System.Runtime.InteropServices.ComTypes;
+using System.Diagnostics.Eventing.Reader;
 
 namespace DiplomacyReplay
 {
@@ -49,19 +50,39 @@ namespace DiplomacyReplay
 
             InitializeComponent();
 
-            MyMap = DipMap.GetTestingMap();
             this.main = main;
-            DataContext = MyMap;
+            
 
             /////
             ///TODO
             //Test code, to remove
             /////
             ///
-            canvasElement.Source = MyMap.BackgroundImage;
+            
             BackgroundLocation = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
 
+            
+            mapCanvas.InvalidateVisual();
 
+            ////
+            ///
+            MyMap = DipMap.GetTestingMap();
+            DataContext = MyMap;
+        }
+
+        private void mapCanvas_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
+        {
+            mapCanvas.Width = MyMap.BackgroundImage.Width;
+            mapCanvas.Height = MyMap.BackgroundImage.Height;
+            var canvas = e.Surface.Canvas;
+            var ele = sender as SKElement;
+
+            ele.Cursor = Cursors.Cross;
+
+            canvas.DrawBitmap(MyMap.BackgroundImage.ToSKBitmap(), 
+                new SKRect(0,0,(float)MyMap.BackgroundImage.Width,(float)MyMap.BackgroundImage.Height));
+
+            
         }
 
         private static SKBitmap LoadSkBitmapFromPngFile(string filePath)
@@ -89,7 +110,6 @@ namespace DiplomacyReplay
             // Create and return a BitmapSource from the stream
             return BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
         }
-
         private string PromptUserForImageLocation()
         {
             string path = string.Empty;
@@ -128,6 +148,8 @@ namespace DiplomacyReplay
 
         private void LoadImageButton_Click(object sender, RoutedEventArgs e)
         {
+            string path = PromptUserForImageLocation();
+            //TODO
             LoadTestingBackground(/*PromptUserForImageLocation()*/);
         }
     }

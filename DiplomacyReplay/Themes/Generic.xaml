@@ -15,7 +15,7 @@
                     <Grid SnapsToDevicePixels="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="auto" MinWidth="200"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- UniformGrid holds the headers -->

@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -82,9 +83,13 @@ namespace DiplomacyReplay
             }
         }
 
-        public List<Tuple<string, SKPoint>> ExtraGarrisons
+        public Dictionary<string, SKPoint> ExtraGarrisons
         {
             get { return extraGarrisons; }
+        }
+        public List<KeyValuePair<string, SKPoint>> ExtraGarrisonsToList
+        {
+            get { return extraGarrisons.ToList(); }
         }
 
         public virtual bool IsSupply {  get { return false; } }
@@ -107,11 +112,8 @@ namespace DiplomacyReplay
                 return GarrisonLoc;
             else
             {
-                foreach (Tuple<string, SKPoint> x in extraGarrisons)
-                {
-                    if (x.Item1 == tag)
-                        return x.Item2;
-                }
+                if(extraGarrisons.ContainsKey(tag))
+                    return extraGarrisons[tag];
             }
 
             return SKPoint.Empty;
@@ -126,7 +128,7 @@ namespace DiplomacyReplay
         public SKPoint AddGarrisonLoc(string tag, SKPoint loc)
         {
             //error checking
-            if (loc == SKPoint.Empty)
+                if (loc == SKPoint.Empty)
                 throw new ArgumentException("loc cannot be SKPoint.Empty", nameof(loc));
             finalizedCheck();
 
@@ -138,26 +140,20 @@ namespace DiplomacyReplay
                 return old;
             }
 
-            Tuple<string, SKPoint> temp = null;
-            foreach (Tuple<string, SKPoint> x in extraGarrisons)
-            {
-                if (x.Item1 == tag)
-                {
-                    temp = x;
-                    break;
-                }
-            }
+            SKPoint temp = SKPoint.Empty;
+            if (extraGarrisons.ContainsKey(tag))
+                temp = extraGarrisons[tag];
+
 
             //tag was already used.  override location and return old
-            if (temp != null)
+            if (temp != SKPoint.Empty)
             {
-                extraGarrisons.Remove(temp);
-                extraGarrisons.Add(new Tuple<string, SKPoint>(tag, loc));
-                return temp.Item2;
+                extraGarrisons.Add(tag, loc);
+                return temp;
             }
             else //tag wasnt used.  
             {
-                extraGarrisons.Add(new Tuple<string, SKPoint>(tag, loc));
+                extraGarrisons.Add(tag, loc);
                 return SKPoint.Empty;
             }
         }
@@ -193,11 +189,11 @@ namespace DiplomacyReplay
         private TERRITORY_TYPE _territoryType;
         private SKPoint _garrisonLoc;
         //Non default garrison locations.  GarrisonLoc, the default loc, is not in here
-        private readonly List<Tuple<string, SKPoint>> extraGarrisons;
+        private readonly Dictionary<string, SKPoint> extraGarrisons;
 
         #endregion
         #region
-//Private Functions//
+        //Private Functions//
 
         protected void finalizedCheck()
         {

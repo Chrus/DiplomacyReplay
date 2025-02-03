@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
       xmlns:local="clr-namespace:DiplomacyReplay"
+      xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="800"
       Title="MapPage">
@@ -12,24 +13,26 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Column="0" Grid.ColumnSpan="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Border x:Name="viewboxBorder"
+        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                      Background="Cyan">
+            <!--<Border x:Name="viewboxBorder"
+                    Grid.Column="1" Grid.ColumnSpan="2"
                     BorderThickness="3" BorderBrush="Red"
-                    Background="Aquamarine">
-                <Viewbox Stretch="None">
-                    <Image x:Name="canvasElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                </Viewbox>
-            </Border>
+                    Background="Aquamarine">-->
+                <skia:SKElement x:Name="mapCanvas"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MinHeight="1" MinWidth="1"
+                                PaintSurface="mapCanvas_PaintSurface"/>
+            <!--</Border>-->
         </ScrollViewer>
 
 
 
-        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2"
-ContentVisibility="Visible">
+        <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2">
             <local:SidebarItem Header="General">
                 <StackPanel Orientation="Vertical" Margin="20">
                     <TextBlock Text="Map Background:" FontSize="15" FontWeight="Bold" TextDecorations="Underline"/>
@@ -40,13 +43,13 @@ ContentVisibility="Visible">
                             Click="LoadImageButton_Click"/>
                 </StackPanel>
             </local:SidebarItem>
-            
+
             <local:SidebarItem Header="Territories">
                 <local:SidebarItem.Content>
                     <local:MapTerritoryTabContent DataContext="{Binding}"/>
                 </local:SidebarItem.Content>
             </local:SidebarItem>
-            
+
             <local:SidebarItem Header="Countries" HorizontalContentAlignment="Stretch">
                 <StackPanel Margin="20" HorizontalAlignment="Stretch">
                     <Button Content="Finalize Check" Height="30"/>
@@ -91,13 +94,13 @@ ContentVisibility="Visible">
                                 </StackPanel>
                             </GroupBox>
 
-                            
+
 
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </local:SidebarItem>
-            
+
         </local:SidebarControl>
     </Grid>
 </Page>

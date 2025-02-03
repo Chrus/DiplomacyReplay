@@ -22,8 +22,8 @@ namespace DiplomacyReplay
     public partial class HomePage : Page
     {
         private readonly MainWindow main;
-        bool mapLoaded = false;
-        bool timelineLoaded = false;
+        //bool mapLoaded = false;
+        //bool timelineLoaded = false;
 
         public HomePage(MainWindow main)
         {
@@ -35,9 +35,7 @@ namespace DiplomacyReplay
         private void NewMapButton_Click(object sender, RoutedEventArgs e)
         {
             main.MapPage.NewMap(new DipMap());
-            mapLoaded = true;
+            //mapLoaded = true;
         }
     }
-
-
 }

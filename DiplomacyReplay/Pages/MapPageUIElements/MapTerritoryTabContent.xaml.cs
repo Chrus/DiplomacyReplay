@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -92,6 +93,36 @@ namespace DiplomacyReplay
 
         private void AddGarrisonBut_Click(object sender, RoutedEventArgs e)
         {
+            var ter = TerList.SelectedItem as Territory;
+            if (ter != null)
+            {
+                for (int x = 1; ; x++)
+                {
+                    if (ter.GetGarrisonLoc("Extra Garrison" + x) == SKPoint.Empty)
+                    {
+                        ter.AddGarrisonLoc("Extra Garrison" + x, new SKPoint(-1, -1));
+                        ExtraGarListBox.ItemsSource = null;
+                        ExtraGarListBox.ItemsSource = ter.ExtraGarrisonsToList;
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void RemExtraGarrisonBut_Click(object sender, RoutedEventArgs e)
+        {
+            if (ExtraGarListBox.SelectedItem == null)
+                return;
+
+            var item = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
+            var ter = TerList.SelectedItem as Territory;
+            if(ter != null)
+            {
+                ter.ExtraGarrisons.Remove(item.Key);
+                ExtraGarListBox.ItemsSource = null;
+                ExtraGarListBox.ItemsSource = ter.ExtraGarrisonsToList;
+            }
         }
 
         private void AddRemSupply_Click(object sender, RoutedEventArgs e)
@@ -108,11 +139,21 @@ namespace DiplomacyReplay
             newTerritory.GarrisonLoc = oldTerritory.GarrisonLoc;
             foreach (var x in oldTerritory.ExtraGarrisons)
             {
-                newTerritory.AddGarrisonLoc(x.Item1, x.Item2);
+                newTerritory.AddGarrisonLoc(x.Key, x.Value);
             }
 
             GetMap().AddTerritory(newTerritory);
             TerList.SelectedIndex = oldIndex;
+        }
+
+        private void TypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == LandBut)
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.LAND;
+            else if (sender == CoastBut)
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.COAST;
+            else
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.WATER;
         }
     }
 }

@@ -4,25 +4,75 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DiplomacyReplay"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="150">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
+             mc:Ignorable="d" >
+    <UserControl.Resources>
+        <Style TargetType="StackPanel">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TextFirst, RelativeSource={RelativeSource AncestorType=local:LocationSelector}}" Value="false">
+                    <Setter Property="FlowDirection" Value="RightToLeft"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!--Setting Button visual-->
+        <Style TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Height="30">
+                            <Ellipse Fill="DarkBlue" Width="25" Height="25"/>
+                            <Ellipse Fill="CornflowerBlue" Width="20" Height="20"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
-        <Border BorderBrush="DarkBlue" BorderThickness=".5" Grid.Column="0" Padding="2">
-            <TextBlock Text="&lt;,>"/>
+    <StackPanel Orientation="Horizontal">
+        <Border BorderBrush="DarkBlue" BorderThickness=".5" Grid.Column="0" Padding="3" Margin="5,0,5,0"
+                VerticalAlignment="Center">
+            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:LocationSelector}, Path=LocationText}">
+            </TextBlock>
         </Border>
-
-        <Button Background="White" Grid.Column="1" Margin="5,0,0,0"
-                Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}">
+        
+        <Button x:Name="SelectBut" Background="White" Grid.Column="1"
+                Click="SelectBut_Click">
+            <!--Dont show Selector button if in finalized mode-->
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CanEdit, RelativeSource={RelativeSource AncestorType=local:LocationSelector}}" Value="false">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
             <Path Fill="Black" Data="M 23.9,0 C 13.1,0 3.8,6.7 0.7,16.7 0.1,18.6 0,19.5 0,22.1 c 0,3.2 0.2,4.5 1.3,7.9 1.9,5.8 3.6,9.1 9.3,17.8 3.9,5.9 7.8,11.1 11.7,15.6 0.8,0.9 1.6,1.6 1.7,1.6 1,-0.3 8.6,-10.2 13,-17 6.6,-10 8.4,-13.7 10.4,-21.4 0.5,-1.8 0.4,-7.3 -0.1,-9.1 C 46.1,13.2 44.3,10.1 41.1,7 36.5,2.5 30.4,0.1 23.8,0.1 Z  m -0.3,9.7 c 0.7,0 1.4,0 2.1,0.1 6.2,1 10.9,5.4 12.1,11.2 0.5,2.4 0.5,3.6 0,5.9 -0.5,2.2 -0.9,3.2 -2.3,5.1 -1.7,2.5 -4.3,4.4 -7.6,5.5 -2,0.6 -5.5,0.7 -7.5,0.2 -4.2,-1.1 -7.7,-4.1 -9.5,-8.1 -0.6,-1.3 -1.3,-4.3 -1.3,-5.6 0,-1.8 0.7,-4.7 1.6,-6.4 2.4,-4.7 7.4,-7.8 12.4,-7.9 z   z">
                 <Path.LayoutTransform>
-                    <ScaleTransform ScaleX=".2" ScaleY=".2"/>
+                    <ScaleTransform ScaleX=".25" ScaleY=".25"/>
                 </Path.LayoutTransform>
             </Path>
         </Button>
-    </Grid>
+
+        <Button x:Name="HighlightBut" Background="White" Grid.Column="2"
+                Click="HighlightBut_Click">
+            <!--Dont show highlight location button if there is no location set-->
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedLocation.IsEmpty, RelativeSource={RelativeSource AncestorType=local:LocationSelector}}" Value="true">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+            <Path Fill="Black" Data="M 9.375,19.738952 V 18.665404 L 9.039063,18.611344 C 7.6633113,18.38993 6.3468178,17.804753 5.21875,16.913223 4.5538073,16.387708 3.7297325,15.454538 3.3007069,14.741259 2.76192,13.845495 2.3630523,12.771967 2.1980178,11.773438 L 2.1424948,11.4375 H 1.0712474 0 V 10.40625 9.375 H 1.072148 2.1442959 L 2.185051,9.087049 C 2.2702053,8.4854 2.5154491,7.6683061 2.8114615,7 3.0712968,6.4133707 3.4790278,5.7506147 3.9265214,5.1875 4.1961597,4.8481938 4.8445356,4.1993384 5.1875,3.9255887 6.3105052,3.0292207 7.7260522,2.404873 9.132813,2.1854507 L 9.375,2.1476751 V 1.0738375 0 h 1.03125 1.03125 v 1.0738375 1.0738376 l 0.242188,0.037776 c 1.515228,0.2363409 2.989767,0.9215499 4.169444,1.9375151 1.255148,1.0809628 2.194902,2.5986075 2.60379,4.2049578 0.0569,0.223548 0.128378,0.550592 0.158834,0.726764 L 18.667126,9.375 h 1.072685 1.072689 v 1.03125 1.03125 h -1.078125 c -1.056114,0 -1.078125,0.0013 -1.078125,0.0623 0,0.127784 -0.163374,0.894013 -0.265687,1.246081 -0.466375,1.604836 -1.477131,3.106124 -2.803283,4.163752 -1.1377,0.907335 -2.574725,1.529571 -4.001342,1.732593 L 11.4375,18.663346 V 19.737923 20.8125 H 10.40625 9.375 Z  m 2.03125,-3.162228 c 1.28676,-0.22596 2.395531,-0.783734 3.325768,-1.673047 1.068343,-1.021342 1.732197,-2.382488 1.891857,-3.879008 C 16.770906,9.646524 16.390371,8.132945 15.599397,6.9498071 13.849889,4.332896 10.477428,3.4157749 7.671875,4.7939635 5.2973178,5.9604312 3.9244587,8.420773 4.1889875,11.035751 c 0.1157112,1.143855 0.5632435,2.26632 1.2753069,3.198624 0.2025302,0.265173 0.7278251,0.80087 1.0044556,1.024347 0.9161426,0.74011 2.091051,1.23271 3.253347,1.364023 0.375239,0.04239 1.329099,0.01633 1.684153,-0.04602 z  M 9.649801,14.500058 C 7.914319,14.176475 6.6033394,12.82826 6.2919891,11.046875 6.2140292,10.600829 6.2481043,9.871691 6.36882,9.402854 6.6308857,8.385039 7.2544308,7.4991242 8.105395,6.935579 9.4731,6.0298261 11.297007,6.0230205 12.67086,6.9185437 c 0.886581,0.5779022 1.494789,1.4300143 1.775639,2.4877063 0.09061,0.341247 0.09555,0.390903 0.0979,0.984375 0.0023,0.581806 -0.0034,0.648115 -0.0825,0.959458 -0.162447,0.639359 -0.404891,1.140651 -0.791819,1.637211 -0.477653,0.612992 -1.192569,1.113708 -1.966649,1.377411 -0.574783,0.195809 -1.427835,0.252033 -2.053628,0.135353 z">
+                <Path.LayoutTransform>
+                    <ScaleTransform ScaleX=".8" ScaleY=".8"/>
+                </Path.LayoutTransform>
+            </Path>
+        </Button>
+    </StackPanel>
 </UserControl>
