@@ -68,7 +68,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         
         <Frame x:Name="HomeFrame"
@@ -88,7 +87,7 @@
         </Border>
 
         <TabControl x:Name="MainTabControl"  TabStripPlacement="Bottom" 
-                    Grid.Row="1"
+                    Grid.Row="1" 
                     Style="{DynamicResource WindowTabControlStyle}"
                     ItemContainerStyle="{DynamicResource TabHeaderStyle}">
 
