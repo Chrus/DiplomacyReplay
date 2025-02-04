@@ -31,7 +31,13 @@ namespace DiplomacyReplay
         public DipMap MyMap
         {
             get { return (DipMap)GetValue(MyMapProperty); }
-            set { SetValue(MyMapProperty, value); }
+            set 
+            {
+                if (MyMap != null)
+                    MessageBox.Show("MapPage map not null and is being overwritten");
+
+                SetValue(MyMapProperty, value); 
+            }
         }
         // Using a DependencyProperty as the backing store for MyMap.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MyMapProperty =
@@ -66,49 +72,27 @@ namespace DiplomacyReplay
 
             ////
             ///
-            MyMap = DipMap.GetTestingMap();
+            MyMap = DipMap.GetTestingMap(true);
             DataContext = MyMap;
         }
 
         private void mapCanvas_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
         {
-            mapCanvas.Width = MyMap.BackgroundImage.Width;
-            mapCanvas.Height = MyMap.BackgroundImage.Height;
             var canvas = e.Surface.Canvas;
-            var ele = sender as SKElement;
+            canvas.Clear();
 
-            ele.Cursor = Cursors.Cross;
+            var dpi = VisualTreeHelper.GetDpi(this);
 
-            canvas.DrawBitmap(MyMap.BackgroundImage.ToSKBitmap(), 
-                new SKRect(0,0,(float)MyMap.BackgroundImage.Width,(float)MyMap.BackgroundImage.Height));
+            float sc = (float)(dpi.PixelsPerInchX / 96);
 
-            
-        }
+            canvas.DrawBitmap(MyMap.BackgroundImage,
+                new SKRect(0,0,MyMap.BackgroundImage.Width, MyMap.BackgroundImage.Height));
 
-        private static SKBitmap LoadSkBitmapFromPngFile(string filePath)
-        {
-            try
-            {
-                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return SKBitmap.Decode(stream);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading image: {ex.Message}");
-                return null;
-            }
-        }
-        private static BitmapSource ConvertSkBitmapToBitmapSource(SKBitmap skBitmap) 
-        {
+            mapCanvas.Width = MyMap.BackgroundImage.Width / sc;
+            mapCanvas.Height = MyMap.BackgroundImage.Height / sc;
 
-            using SKImage skImage = SKImage.FromBitmap(skBitmap);
-            // Get the SKImage's data as a byte array
-            SKData skData = skImage.Encode();
-
-            // Create a MemoryStream from the SKData
-            using var stream = new System.IO.MemoryStream(skData.ToArray());
-            // Create and return a BitmapSource from the stream
-            return BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            var pp = new SKPoint(pointToDraw.X * sc, pointToDraw.Y * sc);
+            canvas.DrawCircle(pp, 5, new SKPaint() { Color = SKColors.Red });
         }
         private string PromptUserForImageLocation()
         {
@@ -131,19 +115,11 @@ namespace DiplomacyReplay
             return path;
         }
 
-        public void NewMap(DipMap map)
-        {
-            if (map != null)
-                MessageBox.Show("MapPage map not null and is being overwritten");
-
-            MyMap = map;
-        }
-
-        public static BitmapSource LoadTestingBackground()
+        public static SKBitmap LoadTestingBackground()
         {
             string path = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
-            SKBitmap bit = LoadSkBitmapFromPngFile(path);
-            return ConvertSkBitmapToBitmapSource(bit);
+            SKBitmap bit = SKBitmap.Decode(path); 
+            return bit;
         }
 
         private void LoadImageButton_Click(object sender, RoutedEventArgs e)
@@ -151,6 +127,13 @@ namespace DiplomacyReplay
             string path = PromptUserForImageLocation();
             //TODO
             LoadTestingBackground(/*PromptUserForImageLocation()*/);
+        }
+
+        private SKPoint pointToDraw = SKPoint.Empty;
+        public void tempDrawTarget(SKPoint point)
+        {
+            pointToDraw = point;
+            mapCanvas.InvalidateVisual();
         }
     }
 }

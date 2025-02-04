@@ -34,7 +34,7 @@ namespace DiplomacyReplay
 
         private void NewMapButton_Click(object sender, RoutedEventArgs e)
         {
-            main.MapPage.NewMap(new DipMap());
+            main.MapPage.MyMap = new DipMap();
             //mapLoaded = true;
         }
     }

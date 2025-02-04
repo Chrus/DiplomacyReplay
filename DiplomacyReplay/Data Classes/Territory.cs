@@ -128,7 +128,7 @@ namespace DiplomacyReplay
         public SKPoint AddGarrisonLoc(string tag, SKPoint loc)
         {
             //error checking
-                if (loc == SKPoint.Empty)
+            if (loc == SKPoint.Empty)
                 throw new ArgumentException("loc cannot be SKPoint.Empty", nameof(loc));
             finalizedCheck();
 
@@ -144,7 +144,6 @@ namespace DiplomacyReplay
             if (extraGarrisons.ContainsKey(tag))
                 temp = extraGarrisons[tag];
 
-
             //tag was already used.  override location and return old
             if (temp != SKPoint.Empty)
             {
@@ -156,6 +155,15 @@ namespace DiplomacyReplay
                 extraGarrisons.Add(tag, loc);
                 return SKPoint.Empty;
             }
+        }
+
+        public void RemoveGarrisonLoc(string tag)
+        {
+            if(!ExtraGarrisons.ContainsKey(tag))
+                return;
+
+            finalizedCheck();
+            extraGarrisons.Remove(tag);
         }
 
         public virtual bool CanFinalize()

@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace DiplomacyReplay
 {
@@ -101,8 +102,9 @@ namespace DiplomacyReplay
                     if (ter.GetGarrisonLoc("Extra Garrison" + x) == SKPoint.Empty)
                     {
                         ter.AddGarrisonLoc("Extra Garrison" + x, new SKPoint(-1, -1));
-                        ExtraGarListBox.ItemsSource = null;
-                        ExtraGarListBox.ItemsSource = ter.ExtraGarrisonsToList;
+                        int i = TerList.SelectedIndex;
+                        TerList.UnselectAll();
+                        TerList.SelectedIndex = i;
 
                         return;
                     }
@@ -119,9 +121,11 @@ namespace DiplomacyReplay
             var ter = TerList.SelectedItem as Territory;
             if(ter != null)
             {
-                ter.ExtraGarrisons.Remove(item.Key);
-                ExtraGarListBox.ItemsSource = null;
-                ExtraGarListBox.ItemsSource = ter.ExtraGarrisonsToList;
+                ter.RemoveGarrisonLoc(item.Key);
+
+                int i = TerList.SelectedIndex;
+                TerList.UnselectAll();
+                TerList.SelectedIndex = i;
             }
         }
 

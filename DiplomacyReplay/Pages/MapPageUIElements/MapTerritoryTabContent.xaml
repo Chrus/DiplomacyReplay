@@ -15,7 +15,8 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
             <!--Editor for when DipMap isnt finalized-->
-            <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch">
+            <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch"
+>
                 <Button Content="Finalize Check" Height="30"/>
 
                 <Separator Margin="-10,10,-10,10" Background="DarkBlue" />
@@ -64,7 +65,7 @@
                             <StackPanel Orientation="Vertical">
                                 <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList, Mode=TwoWay}"/>
                                 <local:LocationSelector LocationName="Location: "
-                                    SelectedLocation="{Binding SelectedItem.NameLoc, ElementName=TerList}"/>
+                                    SelectedLocation="{Binding SelectedItem.NameLoc, ElementName=TerList, Mode=TwoWay}"/>
                             </StackPanel>
                         </GroupBox>
 
@@ -149,17 +150,18 @@
                             </GroupBox.Header>
 
                             <StackPanel Orientation="Vertical">
-                                <local:LocationSelector SelectedLocation="{Binding SelectedItem.SupplyLocation, ElementName=TerList}"/>
+                                <local:LocationSelector SelectedLocation="{Binding SelectedItem.SupplyLocation, ElementName=TerList, Mode=TwoWay}"/>
                             </StackPanel>
                         </GroupBox>
 
                         <!--Garrison-->
                         <GroupBox Header="Garrison">
                             <StackPanel Orientation="Vertical">
-                                <local:LocationSelector SelectedLocation="{Binding SelectedItem.GarrisonLoc, ElementName=TerList}"/>
+                                <local:LocationSelector SelectedLocation="{Binding SelectedItem.GarrisonLoc, ElementName=TerList, Mode=TwoWay}"/>
 
                                 <Separator Margin="5,15,5,10" Background="DarkBlue"/>
 
+                                <!--Extra Garrisons-->
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
                                     <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"
                                             Click="AddGarrisonBut_Click"/>
@@ -194,7 +196,7 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical">
                                                 <TextBlock Text="{Binding Key}"/>
-                                                <local:LocationSelector SelectedLocation="{Binding Value}"/>
+                                                <local:LocationSelector SelectedLocation="{Binding Value}" CanEdit="{Binding SelectedItem.IsEditable, ElementName=TerList}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -206,7 +208,7 @@
             </StackPanel>
 
             <StackPanel x:Name="FinalizedPane"
-d:Visibility="Collapsed" Visibility="Collapsed">
+Visibility="Hidden">
                 <ItemsControl ItemsSource="{Binding Territories.Values}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

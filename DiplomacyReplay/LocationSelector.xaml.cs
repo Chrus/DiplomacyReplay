@@ -81,7 +81,7 @@ namespace DiplomacyReplay
         {
             if (CanEdit)
             {
-                if (SelectedLocation == SKPoint.Empty)
+                if (SelectedLocation == new SKPoint(-1, -1))
                     return "No Set Location";
                 else
                     return LocationName + "<" + SelectedLocation.X + "," + SelectedLocation.Y + ">";
@@ -97,12 +97,49 @@ namespace DiplomacyReplay
 
         private void HighlightBut_Click(object sender, RoutedEventArgs e)
         {
-
+            var win = Window.GetWindow(this) as MainWindow;
+            if (win != null)
+            {
+                MapPage mapP = win.MapPage;
+                if (mapP != null)
+                {
+                    mapP.tempDrawTarget(SelectedLocation);
+                }
+            }
         }
 
         private void SelectBut_Click(object sender, RoutedEventArgs e)
         {
+            Cursor = Cursors.Cross;
+            Mouse.Capture(this);
+        }
 
+        private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsMouseCaptured)
+                return;
+
+            var win = Window.GetWindow(this) as MainWindow;
+            if (win != null)
+            {
+                MapPage mapP = win.MapPage;
+                if (mapP != null)
+                {
+                    if (VisualTreeHelper.HitTest(mapP.mapCanvas,
+                        Mouse.GetPosition(mapP.mapCanvas)) != null)
+                    {
+                        Point pos;
+                        pos = e.GetPosition(mapP.mapCanvas);
+                        SelectedLocation = new SKPoint((float)Math.Round(pos.X), (float)Math.Round(pos.Y));
+                    }
+
+                    Cursor = Cursors.Arrow;
+                    ReleaseMouseCapture();
+                    return;
+                }
+            }
+
+            throw new NullReferenceException("Main Window or MapPage were null");
         }
     }
 }

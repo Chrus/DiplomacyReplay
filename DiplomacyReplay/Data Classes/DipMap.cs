@@ -68,7 +68,7 @@ namespace DiplomacyReplay
                 _countries.Add(country.Name, country);
         }
 
-        public BitmapSource BackgroundImage
+        public SKBitmap BackgroundImage// BitmapSource BackgroundImage
         {
             get { return _backgroundImage; }
             set
@@ -78,11 +78,15 @@ namespace DiplomacyReplay
                 _backgroundImage = value;
             }
         }
-        private BitmapSource _backgroundImage;
+        private SKBitmap _backgroundImage; // BitmapSource _backgroundImage;
 
         public bool IsEditable { get; private set; }
         public virtual bool CanFinalize()
         {
+            //TODO Remove temps
+            //var temp = Territories.All(x => x.Value.CanFinalize());
+            //var temp2 = Countries.All(x => x.Value.CanFinalize());
+
             return BackgroundImage != null
                 && _countries.Count > 0
                 && Territories.Count > 0
@@ -92,14 +96,17 @@ namespace DiplomacyReplay
         public bool Finalize()
         {
             if(CanFinalize())
-            {
+            {  
+                Territories.All(ter => ter.Value.Finalize());
+                Countries.All(con => con.Value.Finalize());
+
                 IsEditable = false;
                 return true;
             }
             return false;
         }
 
-        public static DipMap GetTestingMap()
+        public static DipMap GetTestingMap(bool finalize)
         {
             DipMap map = new DipMap();
 
@@ -142,7 +149,12 @@ namespace DiplomacyReplay
             map.BackgroundImage = MapPage.LoadTestingBackground();
 
             var xtdfsa = map.CanFinalize();
+            if (!xtdfsa)
+                MessageBox.Show("Something in the Testing DipMap cant be finalized");
 
+            if(finalize)
+                map.Finalize();
+            
             return map;
         }
     }

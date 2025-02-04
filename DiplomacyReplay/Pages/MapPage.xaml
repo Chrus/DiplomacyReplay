@@ -16,23 +16,18 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                      Background="Cyan">
-            <!--<Border x:Name="viewboxBorder"
-                    Grid.Column="1" Grid.ColumnSpan="2"
-                    BorderThickness="3" BorderBrush="Red"
-                    Background="Aquamarine">-->
-                <skia:SKElement x:Name="mapCanvas"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                MinHeight="1" MinWidth="1"
-                                PaintSurface="mapCanvas_PaintSurface"/>
-            <!--</Border>-->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                      Background="DarkCyan">
+            <Border x:Name="viewboxBorder"
+                    BorderThickness="2" BorderBrush="Red" Background="LightCyan">
+                <skia:SKElement x:Name="mapCanvas" 
+                                    Cursor="SizeAll"
+                                    PaintSurface="mapCanvas_PaintSurface"/>
+            </Border>
         </ScrollViewer>
 
-
-
         <local:SidebarControl x:Name="sidebar" Grid.Column="0" Grid.ColumnSpan="2">
+            <!--General Sidebar Tab-->
             <local:SidebarItem Header="General">
                 <StackPanel Orientation="Vertical" Margin="20">
                     <TextBlock Text="Map Background:" FontSize="15" FontWeight="Bold" TextDecorations="Underline"/>
@@ -44,12 +39,14 @@
                 </StackPanel>
             </local:SidebarItem>
 
+            <!--Territories Sidebar Tab-->
             <local:SidebarItem Header="Territories">
                 <local:SidebarItem.Content>
                     <local:MapTerritoryTabContent DataContext="{Binding}"/>
                 </local:SidebarItem.Content>
             </local:SidebarItem>
 
+            <!--Countries Sidebar Tab-->
             <local:SidebarItem Header="Countries" HorizontalContentAlignment="Stretch">
                 <StackPanel Margin="20" HorizontalAlignment="Stretch">
                     <Button Content="Finalize Check" Height="30"/>
