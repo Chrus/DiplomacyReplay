@@ -29,8 +29,7 @@ namespace DiplomacyReplay
         }
         public void AddTerritory(Territory territory)
         {
-            if (!IsEditable)
-                throw new InvalidOperationException("Map has been finalized and cannot be edited");
+            finalizedCheck();
             
             var t = new Dictionary<string, Territory>(Territories);
 
@@ -43,13 +42,21 @@ namespace DiplomacyReplay
         }     
         public void RemoveTerritory(Territory territory)
         {
-            if (!IsEditable)
-                throw new InvalidOperationException("Map has been finalized and cannot be edited");
+            finalizedCheck();
 
             var t = new Dictionary<string, Territory>(Territories);
 
             t.Remove(territory.Name);
             SetValue(TerritoriesProperty, t);
+        }
+
+        public void UpdateTerritoryKey(string oldKey, string newKey)
+        {
+            finalizedCheck();
+
+            var ter = Territories[oldKey];
+            Territories.Remove(oldKey);
+            Territories.Add(newKey, ter);
         }
 
         private readonly Dictionary<string, Country> _countries = [];
@@ -73,8 +80,7 @@ namespace DiplomacyReplay
             get { return _backgroundImage; }
             set
             {
-                if (!IsEditable)
-                    throw new InvalidOperationException("Map has been finalized and cannot be edited");
+                finalizedCheck();
                 _backgroundImage = value;
             }
         }
@@ -93,6 +99,13 @@ namespace DiplomacyReplay
                 && Territories.All(x => x.Value.CanFinalize())
                 && Countries.All(x => x.Value.CanFinalize());
         }
+
+        protected void finalizedCheck()
+        {
+            if (!IsEditable)
+                throw new InvalidOperationException("Territory is finalized and can't be edited");
+        }
+
         public bool Finalize()
         {
             if(CanFinalize())

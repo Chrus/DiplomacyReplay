@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -61,6 +62,23 @@ namespace DiplomacyReplay
         {
             InitializeComponent();
         }
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var contex = e.NewValue as DipMap;
+            if (contex == null)
+                throw new InvalidOperationException("Map Page - Territory Sidebar Tab datacontext must be of type DipMap");
+
+            if (contex.IsEditable)
+            {
+                NotFinalizedPane.Visibility = Visibility.Visible;
+                FinalizedPane.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                NotFinalizedPane.Visibility = Visibility.Collapsed; 
+                FinalizedPane.Visibility = Visibility.Visible;
+            }
+        }
 
         private DipMap GetMap()
         {
@@ -71,11 +89,35 @@ namespace DiplomacyReplay
             return x;
         }
 
+        private void FinalizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (GetMap().CanFinalize())
+            {
+                GetMap().Finalize();
+                NotFinalizedPane.Visibility = Visibility.Collapsed;
+                FinalizedPane.Visibility = Visibility.Visible;
+            }
+        }
+
         private void RemoveTerritoryButton_Click(object sender, RoutedEventArgs e)
         {
             var i = TerList.SelectedItem as Territory;
-            if(i != null)
+            if (i != null)
+            {
+                int index = TerList.SelectedIndex;
+
                 GetMap().RemoveTerritory(i);
+
+                if (!TerList.HasItems)
+                    return;
+
+                if (TerList.Items.Count == 1)
+                    TerList.SelectedIndex = 0;
+                else if (index == TerList.Items.Count)
+                    TerList.SelectedIndex = index - 1;
+                else
+                    TerList.SelectedIndex = index;
+            }
         }
 
         private void AddTerritoryButton_Click(object sender, RoutedEventArgs e)
@@ -87,45 +129,47 @@ namespace DiplomacyReplay
                     var ter = new Territory();
                     ter.Name = "Territory" + x;
                     GetMap().AddTerritory(ter);
+
+                    TerList.SelectedIndex = TerList.Items.Count - 1;
                     return;
                 }
             }
         }
 
-        private void AddGarrisonBut_Click(object sender, RoutedEventArgs e)
+        private void TypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == LandBut)
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.LAND;
+            else if (sender == CoastBut)
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.COAST;
+            else
+                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.WATER;
+        }
+
+        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdateTerritoryName();
+        }
+        private void NameBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                UpdateTerritoryName();
+        }
+        private void UpdateTerritoryName()
         {
             var ter = TerList.SelectedItem as Territory;
             if (ter != null)
             {
-                for (int x = 1; ; x++)
-                {
-                    if (ter.GetGarrisonLoc("Extra Garrison" + x) == SKPoint.Empty)
-                    {
-                        ter.AddGarrisonLoc("Extra Garrison" + x, new SKPoint(-1, -1));
-                        int i = TerList.SelectedIndex;
-                        TerList.UnselectAll();
-                        TerList.SelectedIndex = i;
+                if (NameBox.Text == ter.Name || NameBox.Text == "")
+                    return;
 
-                        return;
-                    }
-                }
-            }
-        }
+                string old = ter.Name;
+                ter.Name = NameBox.Text;
+                GetMap().UpdateTerritoryKey(old, NameBox.Text);
 
-        private void RemExtraGarrisonBut_Click(object sender, RoutedEventArgs e)
-        {
-            if (ExtraGarListBox.SelectedItem == null)
-                return;
-
-            var item = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
-            var ter = TerList.SelectedItem as Territory;
-            if(ter != null)
-            {
-                ter.RemoveGarrisonLoc(item.Key);
-
-                int i = TerList.SelectedIndex;
                 TerList.UnselectAll();
-                TerList.SelectedIndex = i;
+                TerList.Items.Refresh();
+                TerList.SelectedItem = ter;
             }
         }
 
@@ -150,14 +194,122 @@ namespace DiplomacyReplay
             TerList.SelectedIndex = oldIndex;
         }
 
-        private void TypeButton_Click(object sender, RoutedEventArgs e)
+        private void AddExtraGarrisonBut_Click(object sender, RoutedEventArgs e)
         {
-            if (sender == LandBut)
-                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.LAND;
-            else if (sender == CoastBut)
-                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.COAST;
-            else
-                ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.WATER;
+            var ter = TerList.SelectedItem as Territory;
+            if (ter != null)
+            {
+                for (int x = 1; ; x++)
+                {
+                    //There was already a location added that wasnt set.  Use that instead.
+                    if (ter.ExtraGarrisons.ContainsKey("Extra Garrison" + x) &&
+                        ter.GetGarrisonLoc("Extra Garrison" + x) == SKPoint.Empty)
+                    {
+                        var existing = new KeyValuePair<string, SKPoint>("Extra Garrison" + x, SKPoint.Empty);
+                        int index = ter.ExtraGarrisonsToList.IndexOf(
+                            new KeyValuePair<string, SKPoint>("Extra Garrison" + x, SKPoint.Empty));
+                        ExtraGarListBox.SelectedIndex = index;
+                        return;
+                    }
+                    else if(!ter.ExtraGarrisons.ContainsKey("Extra Garrison" + x))
+                    { 
+                        ter.AddGarrisonLoc("Extra Garrison" + x, SKPoint.Empty);
+                        int i = TerList.SelectedIndex;
+                        TerList.UnselectAll();
+                        TerList.SelectedIndex = i;
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void RemExtraGarrisonBut_Click(object sender, RoutedEventArgs e)
+        {
+            if (ExtraGarListBox.SelectedItem == null)
+                return;
+
+            var item = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
+            var ter = TerList.SelectedItem as Territory;
+            if (ter != null)
+            {
+                ter.RemoveGarrisonLoc(item.Key);
+
+                int i = TerList.SelectedIndex;
+                TerList.UnselectAll();
+                TerList.SelectedIndex = i;
+            }
+        }
+
+        private void ExtraGarrisonTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var x = sender as TextBox;
+            if (x != null)
+                UpdateExtraGarrisonName(x);
+        }
+
+        private void ExtraGarrisonTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                var x = sender as TextBox;
+                if (x != null)
+                    UpdateExtraGarrisonName(x);
+            }
+        }
+        private void UpdateExtraGarrisonName(TextBox xGarrisonTextBox)
+        {
+            var ter = TerList.SelectedItem as Territory;        
+            if (ter != null && ExtraGarListBox.SelectedItem != null) 
+            {
+                KeyValuePair<string, SKPoint> gar = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
+                if (xGarrisonTextBox.Text == gar.Key)
+                    return;
+                //Territory wont allow a "" to be added anyways.
+                //but reset the textbox also so the user knows it didnt work
+                if (xGarrisonTextBox.Text == "")
+                {
+                    xGarrisonTextBox.Text = gar.Key;
+                    return;
+                }
+
+                string old = gar.Key;
+                ter.UpdateExtraGarrisonKey(old, xGarrisonTextBox.Text);
+
+                int i = TerList.SelectedIndex;
+                TerList.UnselectAll();
+                TerList.SelectedIndex = i;
+            }
+        }
+
+        private void ExtraGarrisonTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if(textBox != null) 
+            {
+                var item = VisualTreeHelper.GetParent(textBox);
+                while (item is not ListBoxItem)
+                    item = VisualTreeHelper.GetParent(item);
+
+                ExtraGarListBox.SelectedItem = ((ListBoxItem)item).DataContext;
+            }
+        }
+
+        //Need to update extra garrison location changes manually 
+        private void ExtraGarrisonLocSel_LostMouseCapture(object sender, MouseEventArgs e)
+        {
+            var sel = sender as LocationSelector;
+            var ter = TerList.SelectedItem as Territory;
+
+            if (sel != null && ter != null)
+            {
+                string key = sel.LocationName;
+                if (ter.ExtraGarrisons[key] != sel.SelectedLocation)
+                {
+                    //AddGarrisonLoc overrides the existing location for that key
+                    ter.AddGarrisonLoc(key, sel.SelectedLocation);
+                }
+            }
         }
     }
 }

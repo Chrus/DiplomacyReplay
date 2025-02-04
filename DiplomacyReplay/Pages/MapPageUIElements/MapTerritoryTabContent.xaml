@@ -6,18 +6,21 @@
              xmlns:local="clr-namespace:DiplomacyReplay"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="650" d:DesignWidth="250" d:Background="CornflowerBlue">
+             d:DesignHeight="650" d:DesignWidth="250" d:Background="CornflowerBlue"
+             
+             DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <local:TypeToVisibilityConverter x:Key="T2VC"/>
         <local:ExtraGarrisonVisibilityConverter x:Key="XGVC"/>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
+    <Grid Background="CornflowerBlue">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
             <!--Editor for when DipMap isnt finalized-->
             <StackPanel x:Name="NotFinalizedPane" Margin="20" HorizontalAlignment="Stretch"
->
-                <Button Content="Finalize Check" Height="30"/>
+d:Visibility="Collapsed">
+                <Button x:Name="FinalizeButton" Content="Finalize" Height="30" Width="60"
+                        Click="FinalizeButton_Click"/>
 
                 <Separator Margin="-10,10,-10,10" Background="DarkBlue" />
 
@@ -58,12 +61,14 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    
+
                     <StackPanel Orientation="Vertical">
                         <!--Name-->
                         <GroupBox Header="Name" Padding="5">
                             <StackPanel Orientation="Vertical">
-                                <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList, Mode=TwoWay}"/>
+                                <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList}"
+                                         LostFocus="NameBox_LostFocus"
+                                         KeyDown="NameBox_KeyDown"/>
                                 <local:LocationSelector LocationName="Location: "
                                     SelectedLocation="{Binding SelectedItem.NameLoc, ElementName=TerList, Mode=TwoWay}"/>
                             </StackPanel>
@@ -164,7 +169,7 @@
                                 <!--Extra Garrisons-->
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,10">
                                     <Button Content="+" Width="20" Height="20" Margin="2,0,2,0"
-                                            Click="AddGarrisonBut_Click"/>
+                                            Click="AddExtraGarrisonBut_Click"/>
                                     <Button x:Name="RemExtraGarrisonBut" Content="-" Width="20" Height="20" Margin="2,0,2,0"
                                             Click="RemExtraGarrisonBut_Click">
                                         <!--Hide Remove Garrison Button if there are none-->
@@ -191,12 +196,18 @@
                                             </Style.Triggers>
                                         </Style>
                                     </ListBox.Style>
-                                    
+
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical">
-                                                <TextBlock Text="{Binding Key}"/>
-                                                <local:LocationSelector SelectedLocation="{Binding Value}" CanEdit="{Binding SelectedItem.IsEditable, ElementName=TerList}"/>
+                                                <TextBox x:Name="ExtraGarrisonTextBox" Text="{Binding Key, Mode=OneWay}"
+                                                         LostFocus="ExtraGarrisonTextBox_LostFocus"
+                                                         KeyDown="ExtraGarrisonTextBox_KeyDown"
+                                                         GotFocus="ExtraGarrisonTextBox_GotFocus"/>
+                                                <local:LocationSelector SelectedLocation="{Binding Value, Mode=OneTime}" 
+                                                                        LocationName="{Binding Key, Mode=OneTime}"
+                                                                        CanEdit="{Binding SelectedItem.IsEditable, ElementName=TerList}"
+                                                                        LostMouseCapture="ExtraGarrisonLocSel_LostMouseCapture"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -206,56 +217,53 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+        </ScrollViewer>
 
-            <StackPanel x:Name="FinalizedPane"
-Visibility="Hidden">
-                <ItemsControl ItemsSource="{Binding Territories.Values}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical" Grid.Row="0"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+        <!--Pane this is displayed when DipMap Finalized-->
+        <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Territories.Values}"
+                 Background="CornflowerBlue" HorizontalContentAlignment="Stretch" 
+                 ScrollViewer.CanContentScroll="False">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="1" BorderBrush="DarkBlue" Margin="2,2.5,2,2.5" Padding="5" Background="CornflowerBlue">
+                        <StackPanel Orientation="Vertical">
+                            <!--Name-->
+                            <local:LocationSelector HorizontalAlignment="Left"
+                                                            LocationName="{Binding Name}"
+                                                            SelectedLocation="{Binding NameLoc}"
+                                                            TextFirst="False" CanEdit="False"/>
+                            <!--Territory Type-->
+                            <TextBlock Text="{Binding TerritoryType}"/>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderThickness="1" BorderBrush="DarkBlue" Margin="5,2.5,5,2.5" Padding="5">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="auto"/>
-                                        <RowDefinition Height="auto"/>
-                                        <RowDefinition Height="auto"/>
-                                        <RowDefinition Height="auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Rectangle Grid.Row="0"      Width="10" Height="10" Fill="red"/>
-                                    <TextBlock Text="{Binding Name}" Grid.Column="1" Grid.Row="0"/>
-
-                                    <TextBlock Text="{Binding TerritoryType}" Grid.Column="1" Grid.Row="1"/>
-
-                                    <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2"
+                            <!--Supply location-->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
                                         Visibility="{Binding Converter={StaticResource T2VC}}">
-                                        <Rectangle Grid.Column="0"      Width="10" Height="10" Fill="red"/>
-                                        <TextBlock Text="{Binding SupplyLocation}" Grid.Column="1" />
-                                    </StackPanel>
+                                <local:LocationSelector LocationName="Supply"
+                                                                SelectedLocation="{Binding SupplyLocation}"
+                                                                TextFirst="False" CanEdit="False" />
+                            </StackPanel>
 
-                                    <Rectangle Grid.Row="3"        Width="10" Height="10" Fill="red"/>
-                                    <TextBlock Text="Garrison Location" Grid.Column="1" Grid.Row="3"/>
+                            <!--Garrison Location-->
+                            <local:LocationSelector LocationName="Garrison" HorizontalAlignment="Left"
+                                                            SelectedLocation="{Binding GarrisonLoc}"
+                                                            TextFirst="False" CanEdit="False"/>
 
-                                    <ListBox Grid.Row="4" Grid.Column="1"
-                                             ItemsSource="{Binding ExtraGarrisons}"
-                                             Visibility="{Binding Converter={StaticResource XGVC}}">
-                                    </ListBox>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </Grid>
-    </ScrollViewer>
+                            <!--Extra Garrison Locations-->
+                            <ItemsControl ItemsSource="{Binding ExtraGarrisonsToList}"
+                                     Visibility="{Binding Converter={StaticResource XGVC}}"
+                                     MaxHeight="100" Background="CornflowerBlue">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:LocationSelector HorizontalAlignment="Left" TextFirst="False" CanEdit="False" Margin="10,0,0,0"
+                                                                        LocationName="{Binding Key, Mode=OneTime}"
+                                                                        SelectedLocation="{Binding Value}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>

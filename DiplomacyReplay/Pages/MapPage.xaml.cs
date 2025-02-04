@@ -72,7 +72,7 @@ namespace DiplomacyReplay
 
             ////
             ///
-            MyMap = DipMap.GetTestingMap(true);
+            MyMap = DipMap.GetTestingMap(false);
             DataContext = MyMap;
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -122,48 +123,44 @@ namespace DiplomacyReplay
         /// <summary>
         /// Add a location for a troop to be drawn, relative to Map, when it is inside the territory.  Throws an error if Territory !IsEditable
         /// </summary>
-        /// <param name="tag">The identifier used for that garrison location.  An empty tag denotes the default location (GarrisonLoc)</param>
+        /// <param name="tag">The identifier used for that garrison location.  An empty tag denotes the default location (GarrisonLoc). 
+        /// If the tag already exists it will be overwritten.  If "" is inputted then the GarrisonLoc property will be overwritten</param>
         /// <param name="loc">The location for a troop to be drawn, relative to Map</param>
-        /// <returns>If tag was already used, override that tag and return the old location.  Otherwise return SKPoint.Empty</returns>
-        public SKPoint AddGarrisonLoc(string tag, SKPoint loc)
+        public void AddGarrisonLoc(string tag, SKPoint loc)
         {
-            //error checking
-            if (loc == SKPoint.Empty)
-                throw new ArgumentException("loc cannot be SKPoint.Empty", nameof(loc));
             finalizedCheck();
 
             //empty string denotes the default location.  Dont add it to the extra garrisons
             if (tag == "")
-            {
-                var old = GarrisonLoc;
                 GarrisonLoc = loc;
-                return old;
-            }
 
-            SKPoint temp = SKPoint.Empty;
+            //Tag already used, override location
             if (extraGarrisons.ContainsKey(tag))
-                temp = extraGarrisons[tag];
-
-            //tag was already used.  override location and return old
-            if (temp != SKPoint.Empty)
-            {
+                extraGarrisons[tag] = loc;
+            else //tag wasnt used. 
                 extraGarrisons.Add(tag, loc);
-                return temp;
-            }
-            else //tag wasnt used.  
-            {
-                extraGarrisons.Add(tag, loc);
-                return SKPoint.Empty;
-            }
         }
 
         public void RemoveGarrisonLoc(string tag)
         {
-            if(!ExtraGarrisons.ContainsKey(tag))
+            finalizedCheck();
+
+            if (!ExtraGarrisons.ContainsKey(tag))
                 return;
 
-            finalizedCheck();
             extraGarrisons.Remove(tag);
+        }
+
+        public void UpdateExtraGarrisonKey(string oldKey, string newKey)
+        {
+            finalizedCheck();
+
+            if (!extraGarrisons.ContainsKey(oldKey))
+                return;
+
+            var ter = extraGarrisons[oldKey];
+            extraGarrisons.Remove(oldKey);
+            extraGarrisons.Add(newKey,ter);
         }
 
         public virtual bool CanFinalize()

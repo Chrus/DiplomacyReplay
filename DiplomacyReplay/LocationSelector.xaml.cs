@@ -62,36 +62,44 @@ namespace DiplomacyReplay
             set 
             {
                 SetValue(CanEditProperty, value);
-                UpdateLocationText();
             }
         }
         public static readonly DependencyProperty CanEditProperty =
             DependencyProperty.Register("CanEdit", typeof(bool), typeof(LocationSelector), new PropertyMetadata(true));
 
-        public string LocationName { get; set; }
+        public string LocationName
+        {
+            get { return (string)GetValue(LocationNameProperty); }
+            set { SetValue(LocationNameProperty, value); }
+        }
+        public static readonly DependencyProperty LocationNameProperty =
+            DependencyProperty.Register("LocationName", typeof(string), typeof(LocationSelector), new PropertyMetadata("", OnSelectedLocationChanged));
+
         public string LocationText
         {
             get { return (string)GetValue(LocationTextProperty); }
             set { SetValue(LocationTextProperty, value); }
         }
         public static readonly DependencyProperty LocationTextProperty =
-            DependencyProperty.Register("LocationText", typeof(string), typeof(LocationSelector), new PropertyMetadata("Unset"));
+            DependencyProperty.Register("LocationText", typeof(string), typeof(LocationSelector), new PropertyMetadata("No Location Set"));
 
         private string UpdateLocationText()
         {
             if (CanEdit)
             {
-                if (SelectedLocation == new SKPoint(-1, -1))
+                if (SelectedLocation == SKPoint.Empty)
                     return "No Set Location";
                 else
-                    return LocationName + "<" + SelectedLocation.X + "," + SelectedLocation.Y + ">";
+                    return "(" + SelectedLocation.X + "," + SelectedLocation.Y + ")";
             }
             else
             {
                 if (SelectedLocation == SKPoint.Empty)
-                    return LocationName + "<,>";
+                    return LocationName + "(,)";
                 else
-                    return LocationName + "<" + SelectedLocation.X + "," + SelectedLocation.Y + ">";
+                {
+                    return LocationName;// + ": (" + SelectedLocation.X + "," + SelectedLocation.Y + ")";
+                }
             }
         }
 
