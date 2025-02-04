@@ -66,9 +66,16 @@
     </Window.Resources>
 
     <Grid>
-        <Frame x:Name="HomeFrame" Margin="0,0,0,50"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        
+        <Frame x:Name="HomeFrame"
+               Grid.Row="0"/>
         
         <Border Background="MediumBlue"
+                Grid.Row="1"
                 Width="50" Height="50"
                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
                 PreviewMouseLeftButtonDown="Home_PreviewMouseLeftButtonDown">
@@ -81,6 +88,7 @@
         </Border>
 
         <TabControl x:Name="MainTabControl"  TabStripPlacement="Bottom" 
+                    Grid.Row="1"
                     Style="{DynamicResource WindowTabControlStyle}"
                     ItemContainerStyle="{DynamicResource TabHeaderStyle}">
 
