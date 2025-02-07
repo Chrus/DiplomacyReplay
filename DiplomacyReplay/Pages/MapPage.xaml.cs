@@ -26,73 +26,43 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class MapPage : Page
     {
-        private readonly MainWindow main;
-
         public DipMap MyMap
         {
             get { return (DipMap)GetValue(MyMapProperty); }
             set 
             {
-                if (MyMap != null)
-                    MessageBox.Show("MapPage map not null and is being overwritten");
-
-                SetValue(MyMapProperty, value); 
+                SetValue(MyMapProperty, value);
+                DataContext = value;
+                mapCanvas.InvalidateVisual();
             }
         }
         // Using a DependencyProperty as the backing store for MyMap.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MyMapProperty =
             DependencyProperty.Register("MyMap", typeof(DipMap), typeof(MapPage), new PropertyMetadata(null));
 
-        public string BackgroundLocation
+        public MapPage()
         {
-            get { return (string)GetValue(BackgroundLocationProperty); }
-            set { SetValue(BackgroundLocationProperty, value); }
-        }
-        public static readonly DependencyProperty BackgroundLocationProperty =
-            DependencyProperty.Register("BackgroundLocation", typeof(string), typeof(MapPage), new PropertyMetadata("No File Loaded"));
-
-        public MapPage(MainWindow main)
-        {
-
             InitializeComponent();
-
-            this.main = main;
-            
-
-            /////
-            ///TODO
-            //Test code, to remove
-            /////
-            ///
-            
-            BackgroundLocation = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
-
-            
-            mapCanvas.InvalidateVisual();
-
-            ////
-            ///
-            MyMap = DipMap.GetTestingMap(false);
-            DataContext = MyMap;
         }
 
-        private void mapCanvas_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
+        private void CloseBackgroundButton_Click(object sender, RoutedEventArgs e)
         {
-            var canvas = e.Surface.Canvas;
-            canvas.Clear();
+            MyMap.BackgroundLocation = "No File Loaded";
+            MyMap.BackgroundImage = null;
+            mapCanvas.InvalidateVisual();
+        }
+        private void LoadImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = PromptUserForImageLocation();
+            if (path == null)
+                return;
 
-            var dpi = VisualTreeHelper.GetDpi(this);
-
-            float sc = (float)(dpi.PixelsPerInchX / 96);
-
-            canvas.DrawBitmap(MyMap.BackgroundImage,
-                new SKRect(0,0,MyMap.BackgroundImage.Width, MyMap.BackgroundImage.Height));
-
-            mapCanvas.Width = MyMap.BackgroundImage.Width / sc;
-            mapCanvas.Height = MyMap.BackgroundImage.Height / sc;
-
-            var pp = new SKPoint(pointToDraw.X * sc, pointToDraw.Y * sc);
-            canvas.DrawCircle(pp, 5, new SKPaint() { Color = SKColors.Red });
+            SKBitmap image = SKBitmap.Decode(path);
+            if (image != null)
+            {
+                MyMap.BackgroundImage = image;
+                MyMap.BackgroundLocation = path;
+            }
         }
         private string PromptUserForImageLocation()
         {
@@ -111,29 +81,43 @@ namespace DiplomacyReplay
                     return null;
                 }
             }
-
             return path;
         }
 
-        public static SKBitmap LoadTestingBackground()
-        {
-            string path = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
-            SKBitmap bit = SKBitmap.Decode(path); 
-            return bit;
+        private void mapCanvas_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
+        {        
+            if(MyMap == null)
+                return;
+
+            if (MyMap.BackgroundImage == null)
+            {
+                e.Surface.Canvas.Clear();
+                return;
+            }
+
+            var canvas = e.Surface.Canvas;
+            canvas.Clear();
+
+            var dpi = VisualTreeHelper.GetDpi(this);
+
+            float sc = (float)(dpi.PixelsPerInchX / 96);
+
+            canvas.DrawBitmap(MyMap.BackgroundImage,
+                new SKRect(0,0,MyMap.BackgroundImage.Width, MyMap.BackgroundImage.Height));
+
+            mapCanvas.Width = MyMap.BackgroundImage.Width / sc;
+            mapCanvas.Height = MyMap.BackgroundImage.Height / sc;
+
+            var pp = new SKPoint(pointToDraw.X * sc, pointToDraw.Y * sc);
+            canvas.DrawCircle(pp, 5, new SKPaint() { Color = SKColors.Red });
         }
 
-        private void LoadImageButton_Click(object sender, RoutedEventArgs e)
-        {
-            string path = PromptUserForImageLocation();
-            //TODO
-            LoadTestingBackground(/*PromptUserForImageLocation()*/);
-        }
-
-        private SKPoint pointToDraw = SKPoint.Empty;
+        //temp code for testing
         public void tempDrawTarget(SKPoint point)
         {
             pointToDraw = point;
             mapCanvas.InvalidateVisual();
         }
+        private SKPoint pointToDraw = SKPoint.Empty;
     }
 }

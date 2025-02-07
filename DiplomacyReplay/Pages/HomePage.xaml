@@ -11,20 +11,86 @@
     <Grid Background="#2293BD">
         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
             
+            <!--Map Section-->
             <GroupBox Header="Map" Padding="20" Margin="150,0,150,0">
                 <StackPanel Orientation="Vertical">
-                    <TextBox Text="None Loaded" IsReadOnly="True"/>
+                    <!--Map File Textblock and close button-->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <!--Hide panel if no file is loaded-->
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MapLoaded}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        
+                        <!--Map File Text-->
+                        <TextBlock Text="{Binding DipMapSaveLocation}" VerticalAlignment="Center" FontSize="15" FontWeight="Bold" Margin="0,0,10,0"/>
+                        
+                        <!--Close Map Button-->
+                        <Button Click="CloseMapButton_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="Width" Value="40"/>
+                                    <Setter Property="Height" Value="40"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Grid>
+                                                <Ellipse Width="20" Height="20" Fill="Red" StrokeThickness="3" Stroke="Black"/>
+                                                <TextBlock Text="X" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,0,1.5"/>
+                                            </Grid>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
 
-                    <Separator Margin="5"/>
-
+                    <!--Map Load Buttons-->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Load Map" Width="150" Height="50" IsEnabled="False"/>
-                        <Button x:Name="NewMapButton" Content="Create New Map" Width="150" Height="50"
+                        <!--Hide Load Buttons if a file is loaded-->
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MapLoaded}" Value="true">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                            
+                        <Button Content="Load Map" Width="150" Height="50"
+                                Click="LoadMapButton_Click"/>
+                        <Button Content="Create New" Width="150" Height="50"
                                 Click="NewMapButton_Click"/>
+                    </StackPanel>
+                    
+                    <!--Map Save Buttons-->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <!--Hide Save Buttons if Map isnt loaded-->
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MapLoaded}" Value="false">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Button Content="Save" Width="150" Height="50"
+                                Click="SaveMapButton_Click"/>
+                        <Button Content="Save As" Width="150" Height="50"
+                                Click="SaveAsMapButton_Click_1"/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
 
+            <!--Timeline Section-->
             <GroupBox Header="Timeline" Padding="20" Margin="150,0,150,0">
                 <StackPanel Orientation="Vertical">
                     <TextBox Text="None Loaded" IsReadOnly="True"/>

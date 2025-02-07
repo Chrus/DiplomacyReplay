@@ -17,7 +17,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace DiplomacyReplay
 {
@@ -66,9 +65,11 @@ namespace DiplomacyReplay
         {
             var contex = e.NewValue as DipMap;
             if (contex == null)
-                throw new InvalidOperationException("Map Page - Territory Sidebar Tab datacontext must be of type DipMap");
-
-            if (contex.IsEditable)
+            {
+                NotFinalizedPane.Visibility = Visibility.Collapsed;
+                FinalizedPane.Visibility = Visibility.Collapsed;
+            }
+            else if (contex.IsEditable)
             {
                 NotFinalizedPane.Visibility = Visibility.Visible;
                 FinalizedPane.Visibility = Visibility.Collapsed;
@@ -157,11 +158,25 @@ namespace DiplomacyReplay
         }
         private void UpdateTerritoryName()
         {
+            //Since the Name is also used as the key for the territory
+            //we have to update DipMap.Territories map key too
+            //Instead of just relying on the Binding Mode=TwoWay
+
             var ter = TerList.SelectedItem as Territory;
             if (ter != null)
             {
-                if (NameBox.Text == ter.Name || NameBox.Text == "")
+                if (NameBox.Text == ter.Name)
                     return;
+
+                //Dont allow an emptry string to be accepted
+                //Dont allow the user to input a key that already exists
+                //Reset the textbox also so the user knows it didnt work
+                if (NameBox.Text == "" ||
+                    GetMap().Territories.ContainsKey(NameBox.Text))
+                {
+                    NameBox.Text = ter.Name;
+                    return;
+                }
 
                 string old = ter.Name;
                 ter.Name = NameBox.Text;
@@ -266,8 +281,10 @@ namespace DiplomacyReplay
                 if (xGarrisonTextBox.Text == gar.Key)
                     return;
                 //Territory wont allow a "" to be added anyways.
+                //Dont allow the user to input a key that already exists
                 //but reset the textbox also so the user knows it didnt work
-                if (xGarrisonTextBox.Text == "")
+                if (xGarrisonTextBox.Text == ""
+                    || ter.ExtraGarrisons.ContainsKey(xGarrisonTextBox.Text))
                 {
                     xGarrisonTextBox.Text = gar.Key;
                     return;

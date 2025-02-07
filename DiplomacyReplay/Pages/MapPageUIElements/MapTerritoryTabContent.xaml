@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DiplomacyReplay"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="250" d:Background="CornflowerBlue"
              
@@ -69,6 +68,7 @@ d:Visibility="Collapsed">
                                 <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList}"
                                          LostFocus="NameBox_LostFocus"
                                          KeyDown="NameBox_KeyDown"/>
+
                                 <local:LocationSelector LocationName="Location: "
                                     SelectedLocation="{Binding SelectedItem.NameLoc, ElementName=TerList, Mode=TwoWay}"/>
                             </StackPanel>
@@ -221,11 +221,11 @@ d:Visibility="Collapsed">
 
         <!--Pane this is displayed when DipMap Finalized-->
         <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Territories.Values}"
-                 Background="CornflowerBlue" HorizontalContentAlignment="Stretch" 
+                 Background="CornflowerBlue" HorizontalContentAlignment="Stretch" BorderThickness="0"
                  ScrollViewer.CanContentScroll="False">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="DarkBlue" Margin="2,2.5,2,2.5" Padding="5" Background="CornflowerBlue">
+                    <Border BorderThickness="3" BorderBrush="DarkBlue" Margin="2,2.5,2,2.5" Padding="5" Background="CornflowerBlue">
                         <StackPanel Orientation="Vertical">
                             <!--Name-->
                             <local:LocationSelector HorizontalAlignment="Left"
@@ -251,7 +251,7 @@ d:Visibility="Collapsed">
                             <!--Extra Garrison Locations-->
                             <ItemsControl ItemsSource="{Binding ExtraGarrisonsToList}"
                                      Visibility="{Binding Converter={StaticResource XGVC}}"
-                                     MaxHeight="100" Background="CornflowerBlue">
+                                     Background="CornflowerBlue">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:LocationSelector HorizontalAlignment="Left" TextFirst="False" CanEdit="False" Margin="10,0,0,0"
