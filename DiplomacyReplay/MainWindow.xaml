@@ -69,9 +69,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <Frame x:Name="HomeFrame"
-               Grid.Row="0"/>
+
+        <!--Home Page-->
+        <Frame Grid.Row="0">
+            <Frame.Content>
+                <local:HomePage x:Name="Home"/>
+            </Frame.Content>
+        </Frame>
         
         <Border Background="MediumBlue"
                 Grid.Row="1"
@@ -91,16 +95,31 @@
                     Style="{DynamicResource WindowTabControlStyle}"
                     ItemContainerStyle="{DynamicResource TabHeaderStyle}">
 
-            <TabItem x:Name="MapTab" Header="Map">
-                <Frame Name="MapFrame" />
+            <!--Map Page-->
+            <TabItem x:Name="MapTab" Header="Map" IsEnabled="False">
+                <Frame>
+                    <Frame.Content>
+                        <local:MapPage x:Name="Map"/>
+                    </Frame.Content>
+                </Frame>
             </TabItem>
 
+            <!--Timeline Page-->
             <TabItem x:Name="TimelineTab" Header="Timeline">
-                <Frame x:Name="TimelineFrame" />
+                <Frame>
+                    <Frame.Content>
+                        <local:TimelinePage x:Name="Timeline"/>
+                    </Frame.Content>
+                </Frame>
             </TabItem>
 
+            <!--Animation Page-->
             <TabItem x:Name="AnimationTab" Header="Animation">
-                <Frame x:Name="AnimationFrame" />
+                <Frame>
+                    <Frame.Content>
+                        <local:AnimationPage x:Name="Animation"/>
+                    </Frame.Content>
+                </Frame>
             </TabItem>
 
         </TabControl>

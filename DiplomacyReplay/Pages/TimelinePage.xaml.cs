@@ -20,11 +20,9 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class TimelinePage : Page
     {
-        private MainWindow main;
-        public TimelinePage(MainWindow main)
+        public TimelinePage()
         {  
             InitializeComponent();
-            this.main = main;
         }
     }
 }

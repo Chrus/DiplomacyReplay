@@ -94,8 +94,9 @@ namespace DiplomacyReplay
             }
             else
             {
+                //Still havnt really decided how i want this formatted.  Just do this for now
                 if (SelectedLocation == SKPoint.Empty)
-                    return LocationName + "(,)";
+                    return LocationName;// + "(,)";
                 else
                 {
                     return LocationName;// + ": (" + SelectedLocation.X + "," + SelectedLocation.Y + ")";

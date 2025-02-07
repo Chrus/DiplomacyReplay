@@ -33,7 +33,7 @@
         </Style>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
         <Border BorderBrush="DarkBlue" BorderThickness=".5" Grid.Column="0" Padding="3" Margin="5,0,5,0"
                 VerticalAlignment="Center">
             <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:LocationSelector}, Path=LocationText}">

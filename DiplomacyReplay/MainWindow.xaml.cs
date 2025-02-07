@@ -22,46 +22,28 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class MainWindow : Window
     {
-        private HomePage homePage;
-        private MapPage mapPage;
-        private TimelinePage timelinePage;
-        private AnimationPage animationPage;
-
-        public HomePage HomePage { get { return homePage; } }
-        public MapPage MapPage { get { return mapPage; } }
-        public TimelinePage TimelinePage { get { return timelinePage; } } 
-        public AnimationPage AnimationPage { get { return animationPage; } }
+        public HomePage HomePage { get { return Home; } }
+        public MapPage MapPage { get { return Map; } }
+        public TimelinePage TimelinePage { get { return Timeline; } } 
+        public AnimationPage AnimationPage { get { return Animation; } }
 
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
-            
+
             Loaded += MainWindow_Loaded;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            homePage = new HomePage(this);
-            mapPage = new MapPage(this);
-            timelinePage = new TimelinePage(this);
-            animationPage = new AnimationPage(this);
-
-            HomeFrame.Content = HomePage;
-            MapFrame.Content = MapPage;
-            TimelineFrame.Content = TimelinePage;
-            AnimationFrame.Content = AnimationPage;
-
             GoToHomePage();
         }
 
-        //Listeners
         private void Home_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             GoToHomePage();
         }
 
-        //Private Functions
         private void GoToHomePage()
         {
             MainTabControl.SelectedItem = null;
