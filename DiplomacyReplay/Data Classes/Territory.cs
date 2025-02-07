@@ -155,7 +155,7 @@ namespace DiplomacyReplay
         {
             finalizedCheck();
 
-            if (!extraGarrisons.ContainsKey(oldKey))
+            if (extraGarrisons.ContainsKey(newKey))
                 return;
 
             var ter = extraGarrisons[oldKey];
@@ -165,10 +165,16 @@ namespace DiplomacyReplay
 
         public virtual bool CanFinalize()
         {
-            return Name != null
+            bool canF = false;
+            canF = Name != null
                 && NameLoc != SKPoint.Empty
                 && TerritoryType != TERRITORY_TYPE.UNDEFINED
                 && GarrisonLoc != SKPoint.Empty;
+
+            if(extraGarrisons.Count> 0) 
+                canF = extraGarrisons.All(gar => gar.Value != SKPoint.Empty);
+
+            return canF;
         }
 
         /// <summary>

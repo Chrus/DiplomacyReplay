@@ -12,7 +12,7 @@ namespace DiplomacyReplay
         public Country() 
         {
             IsEditable = true;
-            spawnPoints = new List<string>();
+            _spawnPoints = new List<string>();
         }
 
         public string Name
@@ -20,8 +20,7 @@ namespace DiplomacyReplay
             get { return _name; }
             set
             {
-                if (!IsEditable)
-                    throw new InvalidOperationException("Country is finalized and cant be edited");
+                finalizedCheck();
                 _name = value;
             }
         }
@@ -32,19 +31,47 @@ namespace DiplomacyReplay
             get { return _color; }
             set
             {
-                if (!IsEditable)
-                    throw new InvalidOperationException("Country is finalized and cant be edited");
+                finalizedCheck();
                 _color = value;
             }
         }
         private SKColor _color;
-        
+
+        public List<string> SpawnPoints 
+        {
+            get { return _spawnPoints; }
+            set
+            {
+                finalizedCheck();
+                _spawnPoints = value;
+            }
+        }
+        private List<string> _spawnPoints { get; set; }
+        public bool IsSpawnPoint(string territoryName)
+        {
+            return _spawnPoints.Contains(territoryName);
+        }
+        public void AddSpawnPoint(string territoryName)
+        {
+            finalizedCheck();
+
+            if (!_spawnPoints.Contains(territoryName))
+                _spawnPoints.Add(territoryName);
+        }
+        public void RemoveSpawnPoint(string territoryName)
+        {
+            finalizedCheck();
+
+            if(_spawnPoints.Contains(territoryName))
+                _spawnPoints.Remove(territoryName);
+        }
+
         public bool IsEditable {  get; private set; }
         public virtual bool CanFinalize()
         {
             return Name != null
                 && Color != SKColor.Empty
-                && spawnPoints.Count > 0;
+                && _spawnPoints.Count > 0;
         }
         public bool Finalize()
         {
@@ -56,17 +83,10 @@ namespace DiplomacyReplay
             return false;
         }
 
-        private List<string> spawnPoints { get; set; }
-        public bool IsSpawnPoint(string territoryName)
-        {
-            return spawnPoints.Contains(territoryName);
-        }
-        public void AddSpawnPoint(string territoryName)
+        protected void finalizedCheck()
         {
             if (!IsEditable)
-                throw new InvalidOperationException("Country is finalized and cannot be edited");
-            if(!spawnPoints.Contains(territoryName))
-                spawnPoints. Add(territoryName);
+                throw new InvalidOperationException("Territory is finalized and can't be edited");
         }
     }
 }
