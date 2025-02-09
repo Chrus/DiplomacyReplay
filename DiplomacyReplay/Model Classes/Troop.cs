@@ -10,23 +10,18 @@ namespace DiplomacyReplay
     {
         public enum TROOP_TYPE
         {
-            UNDEFINED,
+            UNDEFINED = default,
             ARMY,
             FLEET
         }
 
         public Troop(Country owner, TROOP_TYPE type)
         {
-            this.owner = owner.Name;
-            this.type = type;
-        }
-        public Troop(string owner, TROOP_TYPE type)
-        {
-            this.owner = owner;
-            this.type = type;
+            Owner = owner;
+            TroopType = type;
         }
 
-        public readonly string owner;
-        public readonly TROOP_TYPE type;
+        public Country Owner { get; }
+        public TROOP_TYPE TroopType { get; }
     }
 }
