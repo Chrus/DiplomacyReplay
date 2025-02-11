@@ -118,7 +118,7 @@ d:Visibility="Collapsed">
 
                         <!--Supply Point-->
                         <Button x:Name="MakeSupplyBut" Content="Make Supply Point" Margin="5"
-                                                        Click="AddRemSupply_Click">
+                                Click="AddRemSupply_Click">
                             <!--Hide Button if already a supply point-->
                             <Button.Style>
                                 <Style TargetType="Button">

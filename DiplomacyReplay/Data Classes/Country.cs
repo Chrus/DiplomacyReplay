@@ -86,7 +86,7 @@ namespace DiplomacyReplay
         protected void finalizedCheck()
         {
             if (!IsEditable)
-                throw new InvalidOperationException("Territory is finalized and can't be edited");
+                throw new InvalidOperationException("Country is finalized and can't be edited");
         }
     }
 }
