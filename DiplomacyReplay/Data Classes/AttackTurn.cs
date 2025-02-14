@@ -9,7 +9,7 @@ namespace DiplomacyReplay
 {
     internal class AttackTurn : Turn
     {
-        public AttackTurn(int year) : base(year)
+        public AttackTurn(DipYear year) : base(year)
         {
             Retreats = [];
         }

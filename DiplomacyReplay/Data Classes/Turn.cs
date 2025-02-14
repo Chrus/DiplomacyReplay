@@ -17,7 +17,7 @@ namespace DiplomacyReplay
 
     internal abstract class Turn : Editable
     {
-        public Turn(int year)
+        public Turn(DipYear year)
         {
             Year = year;
             Season = SEASON.UNPLAYED;
@@ -25,19 +25,54 @@ namespace DiplomacyReplay
             SupplyOwners = [];
         }
 
-        public int Year { get; set; }
+        public DipYear Year { get; set; }
         public SEASON Season { get; set; }
         public ObservableCollection<Move> Moves { get; private set; }
-        public ObservableDictionary<SupplyTerritory, Country> SupplyOwners { get; private set; }
+
+        public ObservableCollection<SupplyOwner> SupplyOwners { get; private set; }
+        public SupplyOwner GetSupplyOwner(SupplyTerritory territory)
+        {
+            foreach(SupplyOwner x in SupplyOwners)
+            {
+                if (x.Territory == territory)
+                    return x;
+            }
+
+            return null;
+        }
+        public int SupplyCount(Country country)
+        {
+            int ret = 0;
+            foreach (SupplyOwner y in SupplyOwners)
+                if (y.Country == country)
+                    ret++;
+
+            return ret;
+        }
+        public List<SupplyTerritory> GetOwnedSupplies(Country country)
+        {
+            List<SupplyTerritory> ret = [];
+            foreach (SupplyOwner x in SupplyOwners)
+                if (x.Country == country)
+                    ret.Add(x.Territory);
+
+            return ret;
+        }
 
 
         public override bool Finalize()
         {
             throw new NotImplementedException();
         }
-        public override void FinalizeCheck()
+        public override List<Editable> FinalizeCheck()
         {
             throw new NotImplementedException();
+        }
+
+        public class SupplyOwner(SupplyTerritory territory, Country country)
+        {
+            public SupplyTerritory Territory { get; private set; } = territory;
+            public Country Country { get; private set; } = country;
         }
     }
 }

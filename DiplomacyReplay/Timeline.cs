@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    internal class Timeline
+    internal class Timeline : Editable
     {
-        public Timeline(DipMap map, int startYear)
+        public Timeline() { Years = []; }
+        public static Timeline FromNewGame(DipMap map, int startYear)
         {
-            Years.Add(new DipYear(startYear));
-            
+            Timeline time = new Timeline();
+
+            time.Years.Add(DipYear.FromNewGame(map, startYear));
+
+            return time;
         }
 
         public DipYear MostRecentYear { get; private set; }
@@ -22,5 +26,20 @@ namespace DiplomacyReplay
         public Turn SelectedTurn { get; private set; }
 
         public ObservableCollection<DipYear> Years { get; private set; }
+
+        public int StartYear { get { return Years?.FirstOrDefault()?.Year ?? 0; } }
+
+
+
+
+        public override bool Finalize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<Editable> FinalizeCheck()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

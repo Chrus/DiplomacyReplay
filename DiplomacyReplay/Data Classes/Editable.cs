@@ -22,7 +22,17 @@ namespace DiplomacyReplay
                 }
             }
         }
-        public abstract void FinalizeCheck();
+
+        /// <summary>
+        /// Evaluates whether the object is ready to be finalized. This method updates the `CanFinalize` property 
+        /// but does not invoke the `Finalize()` method.
+        /// </summary>
+        /// <returns>
+        /// Returns <c>null</c> if the object is ready to be finalized. Otherwise, it returns a list of `Editable` 
+        /// objects that failed the finalization check, including this object and any other `Editable` objects held by 
+        /// it that did not pass the `FinalizeCheck()` criteria.
+        /// </returns>
+        public abstract List<Editable> FinalizeCheck();
 
         private bool _finalized = false;
         public bool Finalized

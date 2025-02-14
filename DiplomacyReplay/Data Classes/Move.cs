@@ -99,7 +99,7 @@ namespace DiplomacyReplay
             }
             return false;
         }
-        public override void FinalizeCheck()
+        public override List<Editable> FinalizeCheck()
         {
             CanFinalize =
                 Troop != null
@@ -107,6 +107,11 @@ namespace DiplomacyReplay
                 && EndTerritory != null
                 && MoveType != MOVE_TYPE.UNDEFINED
                 && Successful != null;
+
+            if (CanFinalize)
+                return null;
+            else
+                return new List<Editable> { this };
         }
     }
 }

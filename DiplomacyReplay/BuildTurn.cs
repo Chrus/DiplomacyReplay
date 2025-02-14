@@ -8,14 +8,25 @@ namespace DiplomacyReplay
 {
     internal class BuildTurn : Turn
     {
-        public BuildTurn(int year) : base(year) { }
+        public BuildTurn(DipYear year) : base(year) { }
 
         public void SupplyChange(SupplyTerritory supply, Country newOwner)
         {
-            if(SupplyOwners.ContainsKey(supply))
-                SupplyOwners[supply] = newOwner;
+            if (GetSupplyOwner(supply) == null)
+                SupplyOwners.Add(new SupplyOwner(supply, newOwner));
             else
-                SupplyOwners.Add(supply, newOwner);
+                ReplaceSupplyOwner(supply, newOwner);            
+        }
+
+        public void ReplaceSupplyOwner(SupplyTerritory supply, Country newOwner)
+        {
+            for(int x = 0; x < SupplyOwners.Count; x++)
+            {
+                if (SupplyOwners[x].Territory == supply)
+                    SupplyOwners.RemoveAt(x);
+            }
+
+            SupplyOwners.Add(new SupplyOwner(supply,newOwner));
         }
     }
 }

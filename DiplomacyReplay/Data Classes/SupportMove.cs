@@ -59,7 +59,7 @@ namespace DiplomacyReplay
             }
         }
 
-        public override void FinalizeCheck()
+        public override List<Editable> FinalizeCheck()
         {
             CanFinalize =
                 Troop != null
@@ -69,6 +69,11 @@ namespace DiplomacyReplay
                 && Successful != null
                 && SupportedTroop != null
                 && SupportType != SUPPORT_TYPE.UNDEFINED;
+
+            if (CanFinalize)
+                return null;
+            else
+                return new List<Editable> { this };
         }
     }
 }
