@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    public class Troop
+    internal class Troop
     {
         public enum TROOP_TYPE
         {

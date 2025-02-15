@@ -6,15 +6,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DiplomacyReplay"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="650" d:DesignWidth="800"
              
              DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <local:Xceed_SKColorConverter x:Key="XSKCC"/>
         <local:SKColorToBrushConverter x:Key="SKCTBC"/>
-        <local:GetTerritoryLocationConverter x:Key="GTLC"/>
     </UserControl.Resources>
-    
+
     <Grid Background="CornflowerBlue">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <!--Pane displayed when DipMap has not been finalized-->
@@ -26,9 +25,7 @@
                 <Separator Margin="-10,10,-10,10" Background="DarkBlue" />
 
                 <!--Country Listbox-->
-                <ListBox x:Name="CountryList" MinHeight="100" ItemsSource="{Binding Countries.Values}" DisplayMemberPath="Name"
-                         SelectionChanged="CountryList_SelectionChanged">
-                </ListBox>
+                <ListBox x:Name="CountryList" MinHeight="100" ItemsSource="{Binding Countries}" DisplayMemberPath="Name"/>
 
                 <Separator Margin="5,10,5,10" Background="DarkBlue"/>
 
@@ -51,8 +48,9 @@
                     </Button>
                 </StackPanel>
 
-                <!--Country Detail Panel when not finalized-->
-                <Border BorderBrush="DarkBlue" BorderThickness="2" Padding="10" Margin="-5,0,-5,-5">
+                <!--Country Detail Panel-->
+                <Border BorderBrush="DarkBlue" BorderThickness="2" Padding="10" Margin="-5,0,-5,-5"
+d:Visibility="Visible">
                     <!--Hide Detail Panel when no CountryList item is selected-->
                     <Border.Style>
                         <Style TargetType="Border">
@@ -67,9 +65,7 @@
                     <StackPanel Orientation="Vertical">
                         <!--Country Name-->
                         <GroupBox Header="Name">
-                            <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=CountryList}"
-                                 LostFocus="NameBox_LostFocus"
-                                 KeyDown="NameBox_KeyDown"/>
+                            <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=CountryList, UpdateSourceTrigger=PropertyChanged}"/>
                         </GroupBox>
 
                         <!--Country Color-->
@@ -81,28 +77,23 @@
                         <!--Country Spawn Points-->
                         <GroupBox Header="Spawn Points" Padding="5">
                             <StackPanel Orientation="Vertical">
-                                <xctk:CheckComboBox x:Name="spawnSelector" MaxWidth="200"
-                                                    ItemsSource="{Binding Territories.Values}" DisplayMemberPath="Name"
-                                                    Closed="spawnSelector_Closed">
-                                </xctk:CheckComboBox>
+                                <TextBlock Text="Available:"/>
+                                <ListBox x:Name="AvailableSpawns" DisplayMemberPath="Name" SelectionMode="Multiple" MaxHeight="110" MinHeight="50"
+                                         ItemsSource="{Binding SupplyColView.View, RelativeSource={RelativeSource AncestorType=local:MapCountryTabContent}}">
+                                </ListBox>
 
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="150">
-                                    <ItemsControl x:Name="selectedSpawns" ItemsSource="{Binding SelectedItem.SpawnPoints, ElementName=CountryList}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <local:LocationSelector CanEdit="False" TextFirst="False"
-                                                                        LocationName="{Binding}">
-                                                    <local:LocationSelector.SelectedLocation>
-                                                        <MultiBinding Converter="{StaticResource GTLC}">
-                                                            <Binding/>
-                                                            <Binding ElementName="spawnSelector" Path="ItemsSource"/>
-                                                        </MultiBinding>
-                                                    </local:LocationSelector.SelectedLocation>
-                                                </local:LocationSelector>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
+                                <Separator Margin="5,10,5,10" Background="DarkBlue"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-20,0,0">
+                                    <Button x:Name="AddSpawnPointBtn" Content="+" Width="20" Height="20" Margin="2,0,2,0"
+                                            Click="AddSpawnPointBtn_Click"/>
+                                    <Button x:Name="RemoveSpawnPointBtn" Content="-" Width="20" Height="20" Margin="2,0,2,0"
+                                            Click="RemoveSpawnPointBtn_Click"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Selected:"/>
+                                <ListBox x:Name="CountrySpawns" DisplayMemberPath="Name" SelectionMode="Multiple" MaxHeight="110" MinHeight="50"
+                                         ItemsSource="{Binding SelectedItem.SpawnPoints, ElementName=CountryList}">
+                                </ListBox>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -111,7 +102,8 @@
         </ScrollViewer>
 
         <!--Panel that is visiable when DipMap is Finalized-->
-        <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Countries.Values}" Background="CornflowerBlue"
+        <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Countries}" Background="CornflowerBlue"
+d:Visibility="Collapsed"
                  BorderThickness="0" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -130,13 +122,8 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:LocationSelector CanEdit="False" TextFirst="False"
-                                                            LocationName="{Binding}">
-                                            <local:LocationSelector.SelectedLocation>
-                                                <MultiBinding Converter="{StaticResource GTLC}">
-                                                    <Binding/>
-                                                    <Binding ElementName="spawnSelector" Path="ItemsSource"/>
-                                                </MultiBinding>
-                                            </local:LocationSelector.SelectedLocation>
+                                                                LocationName="{Binding Name}"
+                                                                SelectedLocation="{Binding GarrisonLoc}">
                                         </local:LocationSelector>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

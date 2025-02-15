@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,158 +12,100 @@ using SkiaSharp;
 
 namespace DiplomacyReplay
 {
-    public class DipMap : DependencyObject
+    internal class DipMap : Editable
     {
-        public DipMap()
+        public DipMap() 
         {
-            IsEditable = true;
+            Territories = new DipObservableCollection<Territory>(this);
+            Territories.CollectionChanged += Territories_CollectionChanged;
+            Countries = new DipObservableCollection<Country>(this);
         }
 
-        public static readonly DependencyProperty TerritoriesProperty =
-            DependencyProperty.Register("Territories", typeof(Dictionary<string, Territory>), typeof(DipMap), new PropertyMetadata(new Dictionary<string, Territory>()));
-        public Dictionary<string, Territory> Territories
+        private void Territories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            get { return (Dictionary<string, Territory>)GetValue(TerritoriesProperty); }
-        }
-        public void AddTerritory(Territory territory)
-        {
-            finalizedCheck();
-            
-            var t = new Dictionary<string, Territory>(Territories);
-
-            if (t.ContainsKey(territory.Name))
-                t[territory.Name] = territory;
-            else
-                t.Add(territory.Name, territory);
-
-            SetValue(TerritoriesProperty, t);
-        }     
-        public void RemoveTerritory(Territory territory)
-        {
-            finalizedCheck();
-
-            var t = new Dictionary<string, Territory>(Territories);
-
-            t.Remove(territory.Name);
-            SetValue(TerritoriesProperty, t);
-
-            //Make sure to remove this territory from Country.SpawnPoints too
-            foreach(Country c in Countries.Values)
+            if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                c.RemoveSpawnPoint(territory.Name);
-            }
-        }
-        public void UpdateTerritoryKey(string oldKey, string newKey)
-        {
-            finalizedCheck();
-            if (!Territories.ContainsKey(oldKey)
-                || Territories.ContainsKey(newKey))
-                return;
-
-            var ter = Territories[oldKey];
-            Territories.Remove(oldKey);
-            Territories.Add(newKey, ter);
-
-            //Make sure to update this territory in Country.SpawnPoints too
-            foreach(Country c in Countries.Values)
-            {
-                if(c.IsSpawnPoint(oldKey))
+                foreach(var ter in e.OldItems)
                 {
-                    c.RemoveSpawnPoint(oldKey);
-                    c.AddSpawnPoint(newKey);
+                    if (ter is SupplyTerritory)
+                    {
+                        //Make sure to remove this territory from Country.SpawnPoints too
+                        foreach (Country c in Countries)
+                        {
+                            c.SpawnPoints.Remove((SupplyTerritory)ter);
+                        }
+                    }
                 }
             }
         }
 
-
-        public static readonly DependencyProperty CountriesProperty =
-            DependencyProperty.Register("Countries", typeof(Dictionary<string, Country>), typeof(DipMap), new PropertyMetadata(new Dictionary<string,Country>()));
-        public Dictionary<string, Country> Countries
+        public DipObservableCollection<Territory> Territories { get; private set; }
+        public Territory GetTerritory(string name)
         {
-            get { return (Dictionary<string, Country>)GetValue(CountriesProperty); }
-        }
-        public void AddCountry(Country country)
-        {
-            finalizedCheck();
-
-            var c = new Dictionary<string, Country>(Countries);
-
-            if (c.ContainsKey(country.Name))
-                c[country.Name] = country;
-            else
-                c.Add(country.Name, country);
-
-            SetValue(CountriesProperty, c);
-        }
-        public void RemoveCountry(Country country)
-        {
-            finalizedCheck();
-
-            var c = new Dictionary<string, Country>(Countries);
-
-            c.Remove(country.Name);
-            SetValue(CountriesProperty, c);
-        }
-        public void UpdateCountryKey(string oldKey, string newKey)
-        {
-            finalizedCheck();
-            if (!Countries.ContainsKey(oldKey)
-                || Countries.ContainsKey(newKey))
-                return;
-
-            var c = Countries[oldKey];
-            Countries.Remove(oldKey);
-            Countries.Add(newKey, c);
+            foreach(var territory in Territories)
+            {
+                if (territory.Name == name)
+                    return territory;
+            }
+            return null;
         }
 
-        public SKBitmap BackgroundImage// BitmapSource BackgroundImage
+        public DipObservableCollection<Country> Countries {  get; private set; }
+        public Country GetCountry(string name)
+        {
+            foreach(var country in Countries)
+            {
+                if(country.Name == name)
+                    return country;
+            }
+            return null;
+        }
+
+        private SKBitmap _backgroundImage;
+        public SKBitmap BackgroundImage
         {
             get { return _backgroundImage; }
             set
             {
-                finalizedCheck();
+                EditCheck();
                 _backgroundImage = value;
+                OnPropertyChanged(nameof(BackgroundImage));
             }
         }
-        private SKBitmap _backgroundImage; // BitmapSource _backgroundImage;
+
+        private string _backgroundLocation;
         public string BackgroundLocation
         {
-            get { return (string)GetValue(BackgroundLocationProperty); }
+            get { return _backgroundLocation; }
             set 
             {
-                finalizedCheck();
-                SetValue(BackgroundLocationProperty, value); 
+                EditCheck();
+                _backgroundLocation = value;
+                OnPropertyChanged(nameof(BackgroundLocation));
             }
         }
-        public static readonly DependencyProperty BackgroundLocationProperty =
-            DependencyProperty.Register("BackgroundLocation", typeof(string), typeof(MapPage), new PropertyMetadata("No File Loaded"));
 
-        public bool IsEditable { get; private set; }
-        public virtual bool CanFinalize()
+        public override List<Editable> FinalizeCheck()
         {
-            //TODO Remove temps
-            //var temp = Territories.All(x => x.Value.CanFinalize());
-            //var temp2 = Countries.All(x => x.Value.CanFinalize());
+            List<Editable> ret = [];
 
-            return BackgroundImage != null
-                && Countries.Count > 0
-                && Territories.Count > 0
-                && Territories.All(x => x.Value.CanFinalize())
-                && Countries.All(x => x.Value.CanFinalize());
+            if (BackgroundImage == null)
+                ret.Add(this);
+
+            foreach(var terr in Territories)
+                ret.AddRange(terr.FinalizeCheck());
+            foreach (var country in Countries)
+                ret.AddRange(country.FinalizeCheck());
+
+            CanFinalize = ret.Count == 0 ? true : false;
+            return ret;
         }
-        protected void finalizedCheck()
+        public override bool Finalize()
         {
-            if (!IsEditable)
-                throw new InvalidOperationException("Territory is finalized and can't be edited");
-        }
-        public bool Finalize()
-        {
-            if(CanFinalize())
-            {  
-                Territories.All(ter => ter.Value.Finalize());
-                Countries.All(con => con.Value.Finalize());
-
-                IsEditable = false;
+            if(base.Finalize())
+            {
+                Territories.All(ter => ter.Finalize());
+                Countries.All(cou => cou.Finalize());
                 return true;
             }
             return false;
@@ -175,6 +118,7 @@ namespace DiplomacyReplay
             for (int x = 1; x < 15; x++)
             {
                 Territory territory = (x % 3 == 0) ? new SupplyTerritory() : new Territory();
+                //Territory territory = new SupplyTerritory();
                 territory.Name = "Territory" + x;
                 territory.NameLoc = new SKPoint(x * 5 + 5, 50);
                 territory.GarrisonLoc = new SKPoint(x * 5 + 5, 100);
@@ -188,33 +132,42 @@ namespace DiplomacyReplay
 
                 if (x % 4 == 0)
                 {
-                    territory.AddGarrisonLoc("sc" + x, new SKPoint(x * 5 + 5, 130 + (x * 4)));
-                    territory.AddGarrisonLoc("sc2" + x, new SKPoint(x * 5 + 5, 130 + (x * 4 + 10)));
+                    territory.AddExtraGarrison("sc" + x, new SKPoint(x * 5 + 5, 130 + (x * 4)));
+                    territory.AddExtraGarrison("sc2" + x, new SKPoint(x * 5 + 5, 130 + (x * 4 + 10)));
                 }
 
                 if (x % 3 == 0)
                     ((SupplyTerritory)territory).SupplyLocation = new SKPoint(x * 5 + 5, 125);
 
-                map.AddTerritory(territory);
+                map.Territories.Add(territory);
             }
 
-            for (int x = 1; x < 5; x++)
+            for (int x = 1; x < 4; x++)
             {
                 Country country = new Country();
                 country.Name = "Country" + x;
                 country.Color = new SKColor((byte)(300 / x), (byte)(270 / x), (byte)(160 / x), 255);
-                country.AddSpawnPoint(map.Territories["Territory" + x].Name);
-                country.AddSpawnPoint(map.Territories["Territory" + (x+1)].Name);
 
-                map.AddCountry(country);
+                int count = 0;
+                foreach (var ter in map.Territories)
+                {
+                    if (ter is SupplyTerritory)
+                    {
+                        count++;
+                        if(count == x)
+                            country.SpawnPoints.Add((SupplyTerritory)ter);
+                    }
+                }
+
+                map.Countries.Add(country);
             }
 
             map.BackgroundLocation = "C:\\Users\\Chris\\Desktop\\DipMapC.png";
             SKBitmap bit = SKBitmap.Decode(map.BackgroundLocation);
             map.BackgroundImage = bit;
 
-            var xtdfsa = map.CanFinalize();
-            if (!xtdfsa)
+            map.FinalizeCheck();
+            if (!map.CanFinalize)
                 MessageBox.Show("Something in the Testing DipMap cant be finalized");
 
             if(finalize)
@@ -223,6 +176,4 @@ namespace DiplomacyReplay
             return map;
         }
     }
-
-
 }

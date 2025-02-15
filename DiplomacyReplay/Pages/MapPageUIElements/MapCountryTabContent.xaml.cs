@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Globalization;
@@ -53,42 +54,19 @@ namespace DiplomacyReplay
             throw new NotImplementedException();
         }
     }
-    public class GetTerritoryLocationConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            
-            var territories = values[1] as Dictionary<string,Territory>.ValueCollection;
-            string name = values[0] as string;
-            if (territories != null && name != null)
-            {
-                foreach(Territory t in territories)
-                {
-                    if (t.Name == name)
-                        return t.GarrisonLoc;
-                }
-            }
-
-            return SKPoint.Empty;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     /// <summary>
     /// Interaction logic for MapCountryTabContent.xaml
     /// </summary>
     public partial class MapCountryTabContent : UserControl
     {
+        public CollectionViewSource SupplyColView { get; set; } = new CollectionViewSource();
         public MapCountryTabContent()
         {
             InitializeComponent();
 
-            var availableColors = new ObservableCollection<ColorItem>
-            {
+            colorPicker.AvailableColors =
+            [
                 new(Color.FromArgb(255,204, 0, 0), "Backstabbr_Red"),
                 new(Color.FromArgb(255,0,0,170), "Backstabbr_DarkBlue"),
                 new(Color.FromArgb(255,153,153,255), "Backstabbr_LightBlue"),
@@ -96,22 +74,25 @@ namespace DiplomacyReplay
                 new(Color.FromArgb(255,0,170,0), "Backstabbr_Green"),
                 new(Color.FromArgb(255,187,0,187), "Backstabbr_Purple"),
                 new(Color.FromArgb(255,187,187,0), "Backstabbr_Yellow")
-            };
-            colorPicker.AvailableColors = availableColors;
+            ];
+
+            SupplyColView.Filter += FilterTerritories;
         }
 
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var contex = e.NewValue as DipMap;
-            if (contex == null)
+            var context = e.NewValue as DipMap;
+            if (context == null)
             {
                 NotFinalizedPane.Visibility = Visibility.Collapsed;
                 FinalizedPane.Visibility = Visibility.Collapsed;
             }
-            else if (contex.IsEditable)
+            else if (!context.Finalized)
             {
                 NotFinalizedPane.Visibility = Visibility.Visible;
                 FinalizedPane.Visibility = Visibility.Collapsed;
+
+                SupplyColView.Source = GetMap().Territories;
             }
             else
             {
@@ -131,39 +112,52 @@ namespace DiplomacyReplay
 
         private void FinalizeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GetMap().CanFinalize())
+            var results = new List<Editable>();
+
+            foreach (var country in GetMap().Countries)
             {
-                GetMap().Finalize();
+                results.AddRange(country.FinalizeCheck());
+            }
+
+            if (results.Count == 0)
+            {
+                foreach (var country in GetMap().Countries)
+                {
+                    country.Finalize();
+                }
+
                 NotFinalizedPane.Visibility = Visibility.Collapsed;
                 FinalizedPane.Visibility = Visibility.Visible;
             }
         }
-
-        private void CountryList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void FilterTerritories(object sender, FilterEventArgs e)
         {
-            var c = CountryList.SelectedItem as Country;
-            if (c == null)
-                return;
-
-            List<Territory> selected = new List<Territory>();
-            foreach (string item in c.SpawnPoints)
+            //Filter out if not a supply territory
+            if (e.Item is SupplyTerritory supply)
             {
-                if (GetMap().Territories.ContainsKey(item))
-                    selected.Add(GetMap().Territories[item]);
+                //Filter out if its already selected by a country
+                foreach (Country country in GetMap().Countries)
+                {
+                    if (country.IsSpawnPoint(supply.Name))
+                    {
+                        e.Accepted = false;
+                        return;
+                    }
+                }
+                e.Accepted = true;
+                return;
             }
-
-            spawnSelector.SelectedItemsOverride = selected;
+            e.Accepted = false;
         }
 
         private void AddCountryButton_Click(object sender, RoutedEventArgs e)
         {
             for(int i = 1; ; i++) 
             {
-                if (!GetMap().Countries.ContainsKey("Country" + i))
+                if (GetMap().GetCountry("Country" + i) == null)
                 {
-                    Country c = new Country();
-                    c.Name = "Country" + i;
-                    GetMap().AddCountry(c);
+                    Country c = new() { Name = "Country" + i };
+                    GetMap().Countries.Add(c);
 
                     CountryList.SelectedIndex = CountryList.Items.Count - 1;
                     return;
@@ -178,7 +172,7 @@ namespace DiplomacyReplay
             {
                 int index = CountryList.SelectedIndex;
 
-                GetMap().RemoveCountry(country);
+                GetMap().Countries.Remove(country);
 
                 if (!CountryList.HasItems)
                     return;
@@ -192,65 +186,39 @@ namespace DiplomacyReplay
             }
         }
 
-        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
+        private void AddSpawnPointBtn_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCountryName();
-        }
-
-        private void NameBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-                UpdateCountryName();
-        }
-
-        private void UpdateCountryName()
-        {
-            //Since the Name is also used as the key for the country
-            //we have to update DipMap.Countries map key too
-            //Instead of just relying on the Binding Mode=TwoWay
+            var spawns = AvailableSpawns.SelectedItems;
             var country = CountryList.SelectedItem as Country;
-            if (country != null)
+
+            if(spawns == null || country == null)
+                return;
+
+            foreach (SupplyTerritory co in spawns)
             {
-                if (NameBox.Text == country.Name)
-                    return;
-
-                //Dont allow an emptry string to be added
-                //Dont allow the user to input a key that already exists
-                //Reset the textbox also so the user knows it didnt work
-                if (NameBox.Text == ""
-                    || GetMap().Countries.ContainsKey(NameBox.Text))
-                {
-                    NameBox.Text = country.Name;
-                    return;
-                }
-
-                string old = country.Name;
-                country.Name = NameBox.Text;
-                GetMap().UpdateCountryKey(old, NameBox.Text);
-
-                CountryList.UnselectAll();
-                CountryList.Items.Refresh();
-                CountryList.SelectedItem = country;
+                country.SpawnPoints.Add(co);
             }
+
+            AvailableSpawns.UnselectAll();
+            SupplyColView.View.Refresh();
         }
 
-        private void spawnSelector_Closed(object sender, RoutedEventArgs e)
+        private void RemoveSpawnPointBtn_Click(object sender, RoutedEventArgs e)
         {
-            //Update Country.SpawnPoints manually with new spawn points
-            var updated = spawnSelector.SelectedItems;
-            List<string> newSpawnPoints = new List<string>();
+            //need to create a copy because otherwise we're looping through the list being modified
+            var copy = CountrySpawns.SelectedItems.Cast<SupplyTerritory>().ToList();
+            var country = CountryList.SelectedItem as Country;
 
-            foreach (Territory terr in updated)
+            if (copy == null || country == null)
+                return;
+
+            foreach(SupplyTerritory co in copy)
             {
-                newSpawnPoints.Add(terr.Name);
+                country.SpawnPoints.Remove(co);
             }
-            ((Country)CountryList.SelectedItem).SpawnPoints = newSpawnPoints;
 
-            //Update UI visuals, spawnSelector.SelectedItemsOverride and selectedSpawns
-            var country = CountryList.SelectedItem;
-            CountryList.UnselectAll();
-            CountryList.Items.Refresh();
-            CountryList.SelectedItem = country;
+            CountrySpawns.UnselectAll();
+            SupplyColView.View.Refresh();
         }
     }
 }

@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    public class Country
+    internal class Country : Editable
     {
         public Country() 
         {
-            IsEditable = true;
-            _spawnPoints = new List<string>();
+            SpawnPoints = new DipObservableCollection<SupplyTerritory>(this);
         }
 
         public string Name
@@ -20,8 +19,9 @@ namespace DiplomacyReplay
             get { return _name; }
             set
             {
-                finalizedCheck();
+                EditCheck();
                 _name = value;
+                OnPropertyChanged(nameof(Name));
             }
         }
         private string _name;
@@ -31,62 +31,35 @@ namespace DiplomacyReplay
             get { return _color; }
             set
             {
-                finalizedCheck();
+                EditCheck();
                 _color = value;
+                OnPropertyChanged(nameof(Color));
             }
         }
         private SKColor _color;
 
-        public List<string> SpawnPoints 
-        {
-            get { return _spawnPoints; }
-            set
-            {
-                finalizedCheck();
-                _spawnPoints = value;
-            }
-        }
-        private List<string> _spawnPoints { get; set; }
+        public DipObservableCollection<SupplyTerritory> SpawnPoints { get; private set; }
         public bool IsSpawnPoint(string territoryName)
         {
-            return _spawnPoints.Contains(territoryName);
-        }
-        public void AddSpawnPoint(string territoryName)
-        {
-            finalizedCheck();
-
-            if (!_spawnPoints.Contains(territoryName))
-                _spawnPoints.Add(territoryName);
-        }
-        public void RemoveSpawnPoint(string territoryName)
-        {
-            finalizedCheck();
-
-            if(_spawnPoints.Contains(territoryName))
-                _spawnPoints.Remove(territoryName);
-        }
-
-        public bool IsEditable {  get; private set; }
-        public virtual bool CanFinalize()
-        {
-            return Name != null
-                && Color != SKColor.Empty
-                && _spawnPoints.Count > 0;
-        }
-        public bool Finalize()
-        {
-            if(CanFinalize())
+            foreach(var territory in SpawnPoints)
             {
-                IsEditable = false;
-                return true;
+                if(territory.Name == territoryName)
+                    return true;
             }
+
             return false;
         }
 
-        protected void finalizedCheck()
+        public override List<Editable> FinalizeCheck()
         {
-            if (!IsEditable)
-                throw new InvalidOperationException("Country is finalized and can't be edited");
+            CanFinalize =
+                !string.IsNullOrEmpty(Name)
+                && Color != SKColor.Empty
+                && SpawnPoints.Count > 0;
+
+            if (CanFinalize)
+                return [];
+            return [this];
         }
     }
 }

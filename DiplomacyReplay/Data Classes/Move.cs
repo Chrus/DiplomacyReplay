@@ -89,16 +89,6 @@ namespace DiplomacyReplay
             }
         }
 
-        public override bool Finalize()
-        {
-            FinalizeCheck();
-            if(CanFinalize)
-            {
-                Finalized = true;
-                return true;
-            }
-            return false;
-        }
         public override List<Editable> FinalizeCheck()
         {
             CanFinalize =

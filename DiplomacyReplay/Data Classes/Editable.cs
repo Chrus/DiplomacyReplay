@@ -15,6 +15,7 @@ namespace DiplomacyReplay
             get => _canFinalize;
             protected set
             {
+                //only call OnPropertyChanged if its actually been changed
                 if (value != _canFinalize)
                 {
                     _canFinalize = value;
@@ -28,9 +29,8 @@ namespace DiplomacyReplay
         /// but does not invoke the `Finalize()` method.
         /// </summary>
         /// <returns>
-        /// Returns <c>null</c> if the object is ready to be finalized. Otherwise, it returns a list of `Editable` 
-        /// objects that failed the finalization check, including this object and any other `Editable` objects held by 
-        /// it that did not pass the `FinalizeCheck()` criteria.
+        /// Returns a list of `Editable` objects that failed the finalization check, including this object and any 
+        /// other `Editable` objects held by it that did not pass the `FinalizeCheck()` criteria.
         /// </returns>
         public abstract List<Editable> FinalizeCheck();
 
@@ -52,7 +52,17 @@ namespace DiplomacyReplay
             }
         }
 
-        public abstract bool Finalize();
+        public virtual bool Finalize()
+        {
+            FinalizeCheck();
+            if (CanFinalize)
+            {
+                Finalized = true;
+                return true;
+            }
+            return false;
+        }
+
         public void EditCheck()
         {
             if (Finalized)

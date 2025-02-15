@@ -63,13 +63,13 @@ namespace DiplomacyReplay
         }
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var contex = e.NewValue as DipMap;
-            if (contex == null)
+            var context = e.NewValue as DipMap;
+            if (context == null)
             {
                 NotFinalizedPane.Visibility = Visibility.Collapsed;
                 FinalizedPane.Visibility = Visibility.Collapsed;
             }
-            else if (contex.IsEditable)
+            else if (!context.Finalized)
             {
                 NotFinalizedPane.Visibility = Visibility.Visible;
                 FinalizedPane.Visibility = Visibility.Collapsed;
@@ -92,14 +92,39 @@ namespace DiplomacyReplay
 
         private void FinalizeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GetMap().CanFinalize())
+            var results = new List<Editable>();
+
+            foreach(var ter in GetMap().Territories)
             {
-                GetMap().Finalize();
+                results.AddRange(ter.FinalizeCheck());
+            }
+
+            if (results.Count == 0)
+            {
+                foreach( var ter in GetMap().Territories)
+                {
+                    ter.Finalize();
+                }
+
                 NotFinalizedPane.Visibility = Visibility.Collapsed;
                 FinalizedPane.Visibility = Visibility.Visible;
             }
         }
 
+        private void AddTerritoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            for (int x = 1; ; x++)
+            {
+                if (GetMap().GetTerritory("Territory" + x) == null)
+                {
+                    Territory ter = new() { Name = "Territory" + x };
+                    GetMap().Territories.Add(ter);
+
+                    TerList.SelectedIndex = TerList.Items.Count - 1;
+                    return;
+                }
+            }
+        }
         private void RemoveTerritoryButton_Click(object sender, RoutedEventArgs e)
         {
             var i = TerList.SelectedItem as Territory;
@@ -107,7 +132,7 @@ namespace DiplomacyReplay
             {
                 int index = TerList.SelectedIndex;
 
-                GetMap().RemoveTerritory(i);
+                GetMap().Territories.Remove(i);
 
                 if (!TerList.HasItems)
                     return;
@@ -121,22 +146,6 @@ namespace DiplomacyReplay
             }
         }
 
-        private void AddTerritoryButton_Click(object sender, RoutedEventArgs e)
-        {
-            for (int x = 1; ; x++)
-            {
-                if (!GetMap().Territories.Keys.Contains("Territory" + x))
-                {
-                    var ter = new Territory();
-                    ter.Name = "Territory" + x;
-                    GetMap().AddTerritory(ter);
-
-                    TerList.SelectedIndex = TerList.Items.Count - 1;
-                    return;
-                }
-            }
-        }
-
         private void TypeButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender == LandBut)
@@ -145,47 +154,6 @@ namespace DiplomacyReplay
                 ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.COAST;
             else
                 ((Territory)TerList.SelectedItem).TerritoryType = Territory.TERRITORY_TYPE.WATER;
-        }
-
-        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            UpdateTerritoryName();
-        }
-        private void NameBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-                UpdateTerritoryName();
-        }
-        private void UpdateTerritoryName()
-        {
-            //Since the Name is also used as the key for the territory
-            //we have to update DipMap.Territories map key too
-            //Instead of just relying on the Binding Mode=TwoWay
-
-            var ter = TerList.SelectedItem as Territory;
-            if (ter != null)
-            {
-                if (NameBox.Text == ter.Name)
-                    return;
-
-                //Dont allow an emptry string to be accepted
-                //Dont allow the user to input a key that already exists
-                //Reset the textbox also so the user knows it didnt work
-                if (NameBox.Text == "" ||
-                    GetMap().Territories.ContainsKey(NameBox.Text))
-                {
-                    NameBox.Text = ter.Name;
-                    return;
-                }
-
-                string old = ter.Name;
-                ter.Name = NameBox.Text;
-                GetMap().UpdateTerritoryKey(old, NameBox.Text);
-
-                TerList.UnselectAll();
-                TerList.Items.Refresh();
-                TerList.SelectedItem = ter;
-            }
         }
 
         private void AddRemSupply_Click(object sender, RoutedEventArgs e)
@@ -202,10 +170,11 @@ namespace DiplomacyReplay
             newTerritory.GarrisonLoc = oldTerritory.GarrisonLoc;
             foreach (var x in oldTerritory.ExtraGarrisons)
             {
-                newTerritory.AddGarrisonLoc(x.Key, x.Value);
+                newTerritory.AddExtraGarrison(x.Name, x.Location);
             }
 
-            GetMap().AddTerritory(newTerritory);
+            GetMap().Territories.Remove(oldTerritory);
+            GetMap().Territories.Insert(oldIndex, newTerritory);
             TerList.SelectedIndex = oldIndex;
         }
 
@@ -213,30 +182,7 @@ namespace DiplomacyReplay
         {
             var ter = TerList.SelectedItem as Territory;
             if (ter != null)
-            {
-                for (int x = 1; ; x++)
-                {
-                    //There was already a location added that wasnt set.  Use that instead.
-                    if (ter.ExtraGarrisons.ContainsKey("Extra Garrison" + x) &&
-                        ter.GetGarrisonLoc("Extra Garrison" + x) == SKPoint.Empty)
-                    {
-                        var existing = new KeyValuePair<string, SKPoint>("Extra Garrison" + x, SKPoint.Empty);
-                        int index = ter.ExtraGarrisonsToList.IndexOf(
-                            new KeyValuePair<string, SKPoint>("Extra Garrison" + x, SKPoint.Empty));
-                        ExtraGarListBox.SelectedIndex = index;
-                        return;
-                    }
-                    else if(!ter.ExtraGarrisons.ContainsKey("Extra Garrison" + x))
-                    { 
-                        ter.AddGarrisonLoc("Extra Garrison" + x, SKPoint.Empty);
-                        int i = TerList.SelectedIndex;
-                        TerList.UnselectAll();
-                        TerList.SelectedIndex = i;
-
-                        return;
-                    }
-                }
-            }
+                ter.AddExtraGarrison("", SKPoint.Empty);
         }
 
         private void RemExtraGarrisonBut_Click(object sender, RoutedEventArgs e)
@@ -244,65 +190,17 @@ namespace DiplomacyReplay
             if (ExtraGarListBox.SelectedItem == null)
                 return;
 
-            var item = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
+            var item = (Territory.ExtraGarrison)ExtraGarListBox.SelectedItem;
             var ter = TerList.SelectedItem as Territory;
             if (ter != null)
-            {
-                ter.RemoveGarrisonLoc(item.Key);
-
-                int i = TerList.SelectedIndex;
-                TerList.UnselectAll();
-                TerList.SelectedIndex = i;
-            }
+                ter.ExtraGarrisons.Remove(item);
         }
 
-        private void ExtraGarrisonTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            var x = sender as TextBox;
-            if (x != null)
-                UpdateExtraGarrisonName(x);
-        }
-
-        private void ExtraGarrisonTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Enter)
-            {
-                var x = sender as TextBox;
-                if (x != null)
-                    UpdateExtraGarrisonName(x);
-            }
-        }
-        private void UpdateExtraGarrisonName(TextBox xGarrisonTextBox)
-        {
-            var ter = TerList.SelectedItem as Territory;        
-            if (ter != null && ExtraGarListBox.SelectedItem != null) 
-            {
-                KeyValuePair<string, SKPoint> gar = (KeyValuePair<string, SKPoint>)ExtraGarListBox.SelectedItem;
-                if (xGarrisonTextBox.Text == gar.Key)
-                    return;
-                //Territory wont allow a "" to be added anyways.
-                //Dont allow the user to input a key that already exists
-                //but reset the textbox also so the user knows it didnt work
-                if (xGarrisonTextBox.Text == ""
-                    || ter.ExtraGarrisons.ContainsKey(xGarrisonTextBox.Text))
-                {
-                    xGarrisonTextBox.Text = gar.Key;
-                    return;
-                }
-
-                string old = gar.Key;
-                ter.UpdateExtraGarrisonKey(old, xGarrisonTextBox.Text);
-
-                int i = TerList.SelectedIndex;
-                TerList.UnselectAll();
-                TerList.SelectedIndex = i;
-            }
-        }
-
+        //More of a quality of life addition because the textbox is so big.  When it is selected tell the listbox to select that item.
         private void ExtraGarrisonTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
-            if(textBox != null) 
+            if (textBox != null)
             {
                 var item = VisualTreeHelper.GetParent(textBox);
                 while (item is not ListBoxItem)
@@ -312,21 +210,6 @@ namespace DiplomacyReplay
             }
         }
 
-        //Need to update extra garrison location changes manually 
-        private void ExtraGarrisonLocSel_LostMouseCapture(object sender, MouseEventArgs e)
-        {
-            var sel = sender as LocationSelector;
-            var ter = TerList.SelectedItem as Territory;
 
-            if (sel != null && ter != null)
-            {
-                string key = sel.LocationName;
-                if (ter.ExtraGarrisons[key] != sel.SelectedLocation)
-                {
-                    //AddGarrisonLoc overrides the existing location for that key
-                    ter.AddGarrisonLoc(key, sel.SelectedLocation);
-                }
-            }
-        }
     }
 }

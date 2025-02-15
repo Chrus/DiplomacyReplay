@@ -71,8 +71,8 @@ namespace DiplomacyReplay
 
         public class SupplyOwner(SupplyTerritory territory, Country country)
         {
-            public SupplyTerritory Territory { get; private set; } = territory;
-            public Country Country { get; private set; } = country;
+            public SupplyTerritory Territory { get; } = territory;
+            public Country Country { get; } = country;
         }
     }
 }

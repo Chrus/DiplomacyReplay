@@ -26,7 +26,7 @@ namespace DiplomacyReplay
     /// </summary>
     public partial class MapPage : Page
     {
-        public DipMap MyMap
+        internal DipMap MyMap
         {
             get { return (DipMap)GetValue(MyMapProperty); }
             set 

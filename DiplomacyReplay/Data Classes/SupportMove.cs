@@ -71,9 +71,9 @@ namespace DiplomacyReplay
                 && SupportType != SUPPORT_TYPE.UNDEFINED;
 
             if (CanFinalize)
-                return null;
+                return [];
             else
-                return new List<Editable> { this };
+                return [this];
         }
     }
 }

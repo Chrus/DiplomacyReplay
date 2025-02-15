@@ -17,7 +17,7 @@ namespace DiplomacyReplay
             year.Spring = turn;
 
             turn.Season = SEASON.SPRING;
-            foreach(Country c in map.Countries.Values)
+            foreach(Country c in map.Countries)
             {
                 //foreach(SupplyTerritory supply in c.SpawnPoints)
 

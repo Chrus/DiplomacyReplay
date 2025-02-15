@@ -25,7 +25,7 @@ d:Visibility="Collapsed">
 
                 <!--Selection Box-->
                 <ListBox x:Name="TerList" MinHeight="100" MaxHeight="150"
-                         ItemsSource="{Binding Territories.Values}" DisplayMemberPath="Name">
+                         ItemsSource="{Binding Territories}" DisplayMemberPath="Name">
                 </ListBox>
 
                 <Separator Margin="5,10,5,10" Background="DarkBlue"/>
@@ -65,9 +65,7 @@ d:Visibility="Collapsed">
                         <!--Name-->
                         <GroupBox Header="Name" Padding="5">
                             <StackPanel Orientation="Vertical">
-                                <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList}"
-                                         LostFocus="NameBox_LostFocus"
-                                         KeyDown="NameBox_KeyDown"/>
+                                <TextBox x:Name="NameBox" Text="{Binding SelectedItem.Name, ElementName=TerList, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <local:LocationSelector LocationName="Location: "
                                     SelectedLocation="{Binding SelectedItem.NameLoc, ElementName=TerList, Mode=TwoWay}"/>
@@ -185,7 +183,7 @@ d:Visibility="Collapsed">
                                     </Button>
                                 </StackPanel>
 
-                                <ListBox x:Name="ExtraGarListBox" ItemsSource="{Binding SelectedItem.ExtraGarrisonsToList, ElementName=TerList}">
+                                <ListBox x:Name="ExtraGarListBox" ItemsSource="{Binding SelectedItem.ExtraGarrisons, ElementName=TerList}">
                                     <!--Hide Extra Garrison box if there are none-->
                                     <ListBox.Style>
                                         <Style TargetType="ListBox">
@@ -200,14 +198,9 @@ d:Visibility="Collapsed">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical">
-                                                <TextBox x:Name="ExtraGarrisonTextBox" Text="{Binding Key, Mode=OneWay}"
-                                                         LostFocus="ExtraGarrisonTextBox_LostFocus"
-                                                         KeyDown="ExtraGarrisonTextBox_KeyDown"
+                                                <TextBox x:Name="ExtraGarrisonTextBox" Text="{Binding Name}"
                                                          GotFocus="ExtraGarrisonTextBox_GotFocus"/>
-                                                <local:LocationSelector SelectedLocation="{Binding Value, Mode=OneTime}" 
-                                                                        LocationName="{Binding Key, Mode=OneTime}"
-                                                                        CanEdit="{Binding SelectedItem.IsEditable, ElementName=TerList}"
-                                                                        LostMouseCapture="ExtraGarrisonLocSel_LostMouseCapture"/>
+                                                <local:LocationSelector SelectedLocation="{Binding Location, Mode=TwoWay}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -219,8 +212,8 @@ d:Visibility="Collapsed">
             </StackPanel>
         </ScrollViewer>
 
-        <!--Pane this is displayed when DipMap Finalized-->
-        <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Territories.Values}"
+        <!--Pane displayed when DipMap Finalized-->
+        <ListBox x:Name="FinalizedPane" ItemsSource="{Binding Territories}"
                  Background="CornflowerBlue" HorizontalContentAlignment="Stretch" BorderThickness="0"
                  ScrollViewer.CanContentScroll="False">
             <ListBox.ItemTemplate>
@@ -249,14 +242,14 @@ d:Visibility="Collapsed">
                                                             TextFirst="False" CanEdit="False"/>
 
                             <!--Extra Garrison Locations-->
-                            <ItemsControl ItemsSource="{Binding ExtraGarrisonsToList}"
+                            <ItemsControl ItemsSource="{Binding ExtraGarrisons}"
                                      Visibility="{Binding Converter={StaticResource XGVC}}"
                                      Background="CornflowerBlue">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:LocationSelector HorizontalAlignment="Left" TextFirst="False" CanEdit="False" Margin="10,0,0,0"
-                                                                        LocationName="{Binding Key, Mode=OneTime}"
-                                                                        SelectedLocation="{Binding Value}"/>
+                                                                        LocationName="{Binding Name}"
+                                                                        SelectedLocation="{Binding Location}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DiplomacyReplay
 {
-    public class SupplyTerritory : Territory
+    internal class SupplyTerritory : Territory
     {
         public SupplyTerritory() : base() { }
 
@@ -17,18 +17,29 @@ namespace DiplomacyReplay
             get { return _supplyLocation; }
             set
             {
-                finalizedCheck();
+                EditCheck();
                 _supplyLocation = value;
+                OnPropertyChanged(nameof(SupplyLocation));
             }
         }
 
         //Used by .xaml stuff so I dont need to make a million visibility converters
         public override bool IsSupply { get { return true; } }
 
-        public override bool CanFinalize()
+        public override List<Editable> FinalizeCheck()
         {
-            return base.CanFinalize()
-                && SupplyLocation != SKPoint.Empty;
+            var ret = base.FinalizeCheck();
+
+            if(SupplyLocation == SKPoint.Empty) 
+            {
+                CanFinalize = false;
+                if (ret.Count == 0) //base already added 'this' if it had a failure, dont add a copy
+                    ret.Add(this);
+
+                return ret;
+            }
+
+            return ret;
         }
     }
 }
